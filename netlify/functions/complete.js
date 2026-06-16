@@ -33,7 +33,7 @@ function callAnthropic(prompt) {
   return fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
-    body: JSON.stringify({ model: 'claude-3-5-haiku-latest', max_tokens: 1200, messages: [{ role: 'user', content: prompt }] })
+    body: JSON.stringify({ model: 'claude-3-5-haiku-20241022', max_tokens: 1200, messages: [{ role: 'user', content: prompt }] })
   });
 }
 function json(statusCode, obj) {
