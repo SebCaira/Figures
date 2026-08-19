@@ -1,0 +1,120 @@
+import React, { useMemo, useState } from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { colors, fonts, radii } from '../../src/theme/theme';
+import { useSession } from '../../src/lib/session';
+import { useData } from '../../src/lib/data';
+import { useQuizRun } from '../../src/lib/quizRun';
+import { useToast } from '../../src/lib/toast';
+import { computeBadges } from '../../src/lib/badges';
+import { DEMO_CODES } from '../../src/lib/seed';
+import { Card, Chip, PrimaryButton, SectionTitle, TextField } from '../../src/components/ui';
+
+export default function Quizz() {
+  const { session, collection, progress } = useSession();
+  const { allQuizzes } = useData();
+  const { startQuiz } = useQuizRun();
+  const { flashToast } = useToast();
+  const router = useRouter();
+  const [code, setCode] = useState('');
+  const [showAllBadges, setShowAllBadges] = useState(false);
+
+  const prenom = session?.role === 'eleve' ? session.prenom : '';
+  const badges = useMemo(() => computeBadges(collection, progress), [collection, progress]);
+  const earned = badges.filter((b) => b.earned);
+  const shown = showAllBadges ? badges : badges.slice(0, 4);
+
+  const launch = (raw: string) => {
+    const up = raw.trim().toUpperCase();
+    const quiz = allQuizzes[up];
+    if (!quiz) { flashToast("Ce code n'existe pas..."); return; }
+    startQuiz(quiz, 'character');
+    router.push('/quiz');
+  };
+
+  const subjects = Array.from(new Set(collection.map((f) => f.subject)));
+
+  const startRevision = (filter: string) => {
+    router.push({ pathname: '/quiz', params: { revision: '1', filter } });
+  };
+
+  return (
+    <ScrollView style={styles.screen} contentContainerStyle={{ padding: 20, paddingTop: 56, paddingBottom: 40 }}>
+      <Text style={styles.greeting}>Bonjour {prenom}</Text>
+
+      <Card style={{ backgroundColor: colors.navy, marginTop: 18 }}>
+        <Text style={styles.cardTitleDark}>Lancer un quiz</Text>
+        <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
+          <TextField
+            value={code}
+            onChangeText={setCode}
+            placeholder="CODE"
+            autoCapitalize="characters"
+            style={{ flex: 1, letterSpacing: 2 }}
+          />
+          <PrimaryButton label="OK" onPress={() => launch(code)} dark={false} style={{ paddingHorizontal: 22 }} />
+        </View>
+        <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
+          {DEMO_CODES.map((c) => (
+            <Chip key={c} label={c} onPress={() => launch(c)} />
+          ))}
+        </View>
+      </Card>
+
+      <View style={{ marginTop: 26 }}>
+        <SectionTitle>Réviser mes fiches</SectionTitle>
+        <Card style={{ backgroundColor: colors.goldSoft, borderColor: colors.goldSoft }}>
+          <PrimaryButton label="Réviser toutes mes fiches" onPress={() => startRevision('Tous')} dark />
+          {subjects.length > 0 && (
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 12 }}>
+              {subjects.map((s) => (
+                <Chip key={s} label={s} onPress={() => startRevision(s)} color={colors.gold} />
+              ))}
+            </View>
+          )}
+        </Card>
+      </View>
+
+      <View style={{ marginTop: 26 }}>
+        <SectionTitle>Mes récompenses</SectionTitle>
+        {shown.map((b) => (
+          <View key={b.title} style={styles.badgeRow}>
+            <View style={[styles.badgeMark, { backgroundColor: b.earned ? b.accent : colors.border }]}>
+              <Text style={styles.badgeMarkText}>{b.mark}</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.badgeTitle}>{b.title}</Text>
+              <Text style={styles.badgeDesc}>{b.desc}</Text>
+              {!b.earned && (
+                <View style={styles.barTrack}>
+                  <View style={[styles.barFill, { width: `${Math.min(100, (b.cur / b.goal) * 100)}%` }]} />
+                </View>
+              )}
+            </View>
+            {!b.earned && <Text style={styles.badgeCount}>{b.cur}/{b.goal}</Text>}
+          </View>
+        ))}
+        {badges.length > 4 && (
+          <Text style={styles.toggleAll} onPress={() => setShowAllBadges((s) => !s)}>
+            {showAllBadges ? 'Voir moins' : 'Voir toutes mes récompenses'}
+          </Text>
+        )}
+      </View>
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: colors.cream },
+  greeting: { fontFamily: fonts.serifSemiBold, fontSize: 26, color: colors.navy },
+  cardTitleDark: { fontFamily: fonts.serifSemiBold, fontSize: 17, color: colors.cream },
+  badgeRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
+  badgeMark: { width: 40, height: 40, borderRadius: radii.md, alignItems: 'center', justifyContent: 'center' },
+  badgeMarkText: { fontFamily: fonts.serifSemiBold, fontSize: 16, color: colors.white },
+  badgeTitle: { fontFamily: fonts.sansBold, fontSize: 14, color: colors.navy },
+  badgeDesc: { fontFamily: fonts.sans, fontSize: 12, color: colors.muted, marginTop: 1 },
+  barTrack: { height: 4, backgroundColor: colors.border, borderRadius: 2, marginTop: 6, overflow: 'hidden' },
+  barFill: { height: 4, backgroundColor: colors.gold },
+  badgeCount: { fontFamily: fonts.sansBold, fontSize: 12, color: colors.muted },
+  toggleAll: { fontFamily: fonts.sansBold, fontSize: 13, color: colors.navy, marginTop: 8 },
+});
