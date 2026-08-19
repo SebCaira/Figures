@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { colors, fonts, radii, subjectMeta } from '../theme/theme';
 import { Fiche, ProgressEntry } from '../lib/session';
 import { FicheAvatar } from './FicheCard';
+import { famName } from '../lib/text';
 
 export function FicheDetail({ fiche, progress }: { fiche: Fiche; progress?: ProgressEntry }) {
   const meta = subjectMeta(fiche.subject);
@@ -14,7 +15,7 @@ export function FicheDetail({ fiche, progress }: { fiche: Fiche; progress?: Prog
       </View>
       <View style={styles.header}>
         <FicheAvatar fiche={fiche} size={84} />
-        <Text style={styles.name}>{fiche.name}</Text>
+        <Text style={styles.name}>{famName(fiche.name)}</Text>
         {!!fiche.role && <Text style={styles.role}>{fiche.role}</Text>}
         {(fiche.years || fiche.place) && (
           <Text style={styles.meta}>{[fiche.years, fiche.place].filter(Boolean).join(' · ')}</Text>

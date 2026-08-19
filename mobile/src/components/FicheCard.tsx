@@ -2,6 +2,7 @@ import React from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors, fonts, radii, subjectMeta } from '../theme/theme';
 import { Fiche, ProgressEntry } from '../lib/session';
+import { famName } from '../lib/text';
 
 function initials(name: string) {
   return name.split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? '').join('');
@@ -25,7 +26,7 @@ export function FicheCard({ fiche, progress, onPress }: { fiche: Fiche; progress
   return (
     <Pressable onPress={onPress} style={styles.card}>
       <FicheAvatar fiche={fiche} size={64} />
-      <Text style={styles.name} numberOfLines={1}>{fiche.name}</Text>
+      <Text style={styles.name} numberOfLines={1}>{famName(fiche.name)}</Text>
       {!!fiche.years && <Text style={styles.years} numberOfLines={1}>{fiche.years}</Text>}
       <View style={[styles.badge, { backgroundColor: mastered ? colors.greenSoft : colors.amberSoft }]}>
         <Text style={[styles.badgeText, { color: mastered ? colors.greenDark : colors.amber }]}>

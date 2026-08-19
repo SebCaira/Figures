@@ -5,6 +5,7 @@ import { colors, fonts, radii, subjectMeta } from '../src/theme/theme';
 import { useSession } from '../src/lib/session';
 import { useQuizRun } from '../src/lib/quizRun';
 import { buildRevisionQuiz } from '../src/lib/revision';
+import { famName } from '../src/lib/text';
 import { FicheAvatar } from '../src/components/FicheCard';
 import { PrimaryButton } from '../src/components/ui';
 
@@ -60,7 +61,7 @@ export default function Quiz() {
 
       {run.mode === 'character' ? (
         <View style={[styles.chip, { backgroundColor: meta.soft }]}>
-          <Text style={[styles.chipText, { color: meta.color }]}>Tu construis la fiche de {'name' in quiz ? quiz.name : ''}</Text>
+          <Text style={[styles.chipText, { color: meta.color }]}>Tu construis la fiche de {'name' in quiz ? famName(quiz.name) : ''}</Text>
         </View>
       ) : (
         <View style={[styles.chip, { backgroundColor: colors.goldSoft }]}>

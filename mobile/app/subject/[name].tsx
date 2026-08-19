@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { colors, fonts, radii, subjectMeta } from '../../src/theme/theme';
 import { useData } from '../../src/lib/data';
+import { famName } from '../../src/lib/text';
 import { BackButton, PrimaryButton } from '../../src/components/ui';
 
 export default function SubjectDetail() {
@@ -29,7 +30,7 @@ export default function SubjectDetail() {
       <View style={{ marginTop: 18, gap: 10 }}>
         {chars.map((c) => (
           <View key={c.code} style={styles.card}>
-            <Text style={styles.name}>{c.name}</Text>
+            <Text style={styles.name}>{famName(c.name)}</Text>
             <Text style={styles.meta}>{c.niveau} · {c.langue} · {c.questions.length} questions · par {c.by}</Text>
             <View style={styles.codeRow}>
               <Text style={styles.codeLabel}>Code</Text>
