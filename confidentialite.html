@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Politique de confidentialité — Figures</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #ECE7DA;
+    color: #21303F;
+    font-family: -apple-system, BlinkMacSystemFont, "Public Sans", system-ui, sans-serif;
+    line-height: 1.6;
+  }
+  .wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+  .logo {
+    width: 52px; height: 52px; border-radius: 14px;
+    background: #21303F; color: #F6F2E9;
+    display: flex; align-items: center; justify-content: center;
+    font-family: Georgia, "Newsreader", serif; font-size: 26px; font-weight: 600;
+    margin-bottom: 20px;
+  }
+  .logo span { color: #B0863C; }
+  h1 {
+    font-family: Georgia, "Newsreader", serif;
+    font-size: 30px;
+    margin: 0 0 6px;
+    color: #21303F;
+  }
+  .updated { color: #8A8675; font-size: 13px; margin-bottom: 36px; }
+  h2 {
+    font-family: Georgia, "Newsreader", serif;
+    font-size: 19px;
+    margin: 36px 0 10px;
+    color: #21303F;
+  }
+  p, li { font-size: 15px; color: #21303F; }
+  ul { padding-left: 20px; }
+  li { margin-bottom: 6px; }
+  .card {
+    background: #FFFCF5;
+    border: 1px solid #E7E1D3;
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin: 18px 0;
+  }
+  a { color: #B0863C; }
+  .contact {
+    background: #F3E9D6;
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-top: 36px;
+  }
+  footer { margin-top: 48px; font-size: 12px; color: #8A8675; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">F<span>.</span></div>
+  <h1>Politique de confidentialité</h1>
+  <div class="updated">Dernière mise à jour : 19 août 2026</div>
+
+  <p>
+    <strong>Figures</strong> est une application éducative destinée au milieu scolaire, qui permet à un·e
+    enseignant·e de créer des personnages (historiques, littéraires, scientifiques…) sous forme de quiz, et
+    à ses élèves d'y répondre pour constituer et réviser des fiches de révision personnelles.
+  </p>
+  <p>
+    Cette politique explique quelles données sont collectées, pourquoi, où elles sont stockées, et comment
+    les faire modifier ou supprimer.
+  </p>
+
+  <h2>Qui sommes-nous ?</h2>
+  <p>
+    Figures est éditée par Sébastien Caira, développeur indépendant. Pour toute question relative à cette
+    politique ou à vos données, contactez : <a href="mailto:caira.sebastien@gmail.com">caira.sebastien@gmail.com</a>.
+  </p>
+
+  <h2>Quelles données sont collectées ?</h2>
+
+  <div class="card">
+    <p><strong>Compte enseignant·e</strong></p>
+    <ul>
+      <li>Prénom / nom affiché</li>
+      <li>Adresse email (utilisée pour la connexion, via un prestataire d'authentification sécurisé)</li>
+      <li>Mot de passe (jamais stocké en clair — géré par notre prestataire d'authentification, Supabase)</li>
+      <li>Les classes et personnages (quiz) que vous créez</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <p><strong>Compte élève</strong></p>
+    <ul>
+      <li>Prénom et nom, tels que renseignés par l'élève au moment de rejoindre une classe avec un code fourni par l'enseignant·e</li>
+      <li>La classe rejointe</li>
+      <li>La progression aux quiz : scores, fiches collectées, statut de maîtrise</li>
+    </ul>
+    <p>Aucun élève ne crée de compte avec mot de passe : l'identification se fait uniquement par le code de
+      classe et le prénom/nom, sous la responsabilité de l'enseignant·e et de l'établissement.</p>
+  </div>
+
+  <div class="card">
+    <p><strong>Génération de contenu par IA</strong></p>
+    <p>
+      Lorsqu'un·e enseignant·e utilise la fonction « Générer la fiche avec l'IA », seul le <strong>nom du
+      personnage</strong> tapé (ex. « Marie Curie »), la matière, le niveau scolaire et la langue choisie sont
+      envoyés à notre service de génération de texte (Anthropic, modèles Claude) pour produire le contenu de
+      la fiche et du quiz. <strong>Aucune donnée personnelle d'élève n'est jamais transmise à ce service.</strong>
+    </p>
+  </div>
+
+  <h2>Où sont stockées les données ?</h2>
+  <p>
+    Les comptes, classes, personnages et progressions sont stockés dans une base de données hébergée par
+    <strong>Supabase</strong>, notre prestataire d'hébergement de données. Une copie locale (fiches collectées,
+    progression, préférences) est également conservée directement sur l'appareil de l'élève ou de
+    l'enseignant·e, pour un usage hors connexion.
+  </p>
+
+  <h2>Pourquoi ces données sont-elles collectées ?</h2>
+  <ul>
+    <li>Permettre la création de comptes et la connexion</li>
+    <li>Faire fonctionner les classes, les quiz et le suivi de progression</li>
+    <li>Permettre à un·e enseignant·e de suivre les résultats de sa classe</li>
+    <li>Générer automatiquement le contenu pédagogique demandé par l'enseignant·e</li>
+  </ul>
+  <p>Ces données ne sont <strong>ni vendues, ni utilisées à des fins publicitaires</strong>, et l'application
+    ne contient aucun traqueur publicitaire ni outil d'analyse tiers.</p>
+
+  <h2>Élèves mineurs</h2>
+  <p>
+    Figures est conçue pour un usage scolaire. Pour les élèves mineurs, l'utilisation de l'application se
+    fait sous la responsabilité de l'enseignant·e et de l'établissement, qui s'assurent du cadre
+    d'utilisation approprié (ex. information des familles selon les règles internes de l'établissement).
+  </p>
+
+  <h2>Combien de temps les données sont-elles conservées ?</h2>
+  <p>
+    Les données sont conservées tant que le compte (enseignant·e) ou la classe reste active. Un·e
+    enseignant·e ou un·e élève peut demander la suppression de son compte et des données associées à tout
+    moment en nous contactant (voir ci-dessous).
+  </p>
+
+  <h2>Vos droits</h2>
+  <p>
+    Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez d'un droit d'accès,
+    de rectification, d'effacement et de portabilité de vos données. Pour un·e élève mineur·e, ces droits
+    peuvent être exercés par un parent, responsable légal, ou l'enseignant·e/établissement.
+  </p>
+
+  <div class="contact">
+    <p style="margin:0 0 6px;"><strong>Pour exercer ces droits ou pour toute question</strong></p>
+    <p style="margin:0;">Écrivez-nous à <a href="mailto:caira.sebastien@gmail.com">caira.sebastien@gmail.com</a> — nous répondons dans les meilleurs délais.</p>
+  </div>
+
+  <footer>Figures — application éducative conçue dans le respect du RGPD et de l'accessibilité.</footer>
+</div>
+</body>
+</html>
