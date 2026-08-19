@@ -2,9 +2,9 @@ import { Question } from './seed';
 
 // Talks to the existing Netlify function (netlify/functions/complete.js) that proxies
 // the Anthropic API. The API key never lives in the mobile app — it stays server-side
-// on Netlify. Point EXPO_PUBLIC_API_BASE_URL at the deployed Figures web app's origin
-// (e.g. https://figures-app.netlify.app) — see .env.example.
-const BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || '';
+// on Netlify. Defaults to the deployed Figures web app's origin; override with
+// EXPO_PUBLIC_API_BASE_URL (see .env.example) if that ever moves.
+const BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || 'https://figurescollege.netlify.app';
 
 const FMT =
   '{"role":"titre court","years":"dates ex. 1867 – 1934","place":"lieu de naissance",' +
