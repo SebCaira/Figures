@@ -24,9 +24,8 @@
   "submit": {
     "production": {
       "ios": {
-        "appleId": "TON_APPLE_ID@example.com",
-        "ascAppId": "REMPLIR_APRES_CREATION_APP_STORE_CONNECT",
-        "appleTeamId": "REMPLIR_AVEC_TON_TEAM_ID"
+        "appleId": "caira.sebastien@gmail.com",
+        "appleTeamId": "JV465JP3X4"
       }
     }
   }
