@@ -37,15 +37,21 @@ type Ctx = {
 
 const DataCtx = createContext<Ctx | null>(null);
 
+// Strips accents (é→e, â→a, …) before removing non-letters, so generated
+// codes stay readable instead of silently dropping accented characters.
+function deaccent(s: string) {
+  return s.normalize('NFD').replace(/[̀-ͯ]/g, '');
+}
+
 function genClassCode(name: string) {
-  const prefix = (name.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 4)) || 'CLS';
+  const prefix = (deaccent(name).replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 4)) || 'CLS';
   const num = Math.floor(1000 + Math.random() * 9000);
   return `${prefix}-${num}`;
 }
 
 function genQuizCode(name: string) {
   const base = name.trim().split(/\s+/).pop() || name.trim();
-  const clean = base.replace(/[^a-zA-Z]/g, '').toUpperCase().slice(0, 8) || 'PERSO';
+  const clean = deaccent(base).replace(/[^a-zA-Z]/g, '').toUpperCase().slice(0, 8) || 'PERSO';
   return `${clean}${Math.floor(10 + Math.random() * 89)}`;
 }
 
