@@ -17,6 +17,17 @@ export default function Result() {
   const [saved, setSaved] = useState(false);
 
   const quiz = run.quiz;
+
+  const fiche = useMemo(() => {
+    if (!quiz || run.mode !== 'character' || !('name' in quiz)) return null;
+    const q = quiz as any;
+    return {
+      id: q.code.toLowerCase(), code: q.code, name: q.name, subject: q.subject,
+      years: q.years, role: q.role, place: q.place, photo: q.photo,
+      didYouKnow: q.didYouKnow, works: q.works, facts: run.facts, by: q.by,
+    };
+  }, [quiz, run]);
+
   if (!quiz) return <View style={{ flex: 1, backgroundColor: colors.cream }} />;
 
   const total = quiz.questions.length;
@@ -28,16 +39,6 @@ export default function Result() {
       : pct >= 60
         ? 'Bien joué, continue comme ça.'
         : (run.mode === 'character' ? 'Pas grave : ta fiche est quand même remplie pour réviser.' : 'Continue à réviser, tu vas progresser.');
-
-  const fiche = useMemo(() => {
-    if (run.mode !== 'character' || !('name' in quiz)) return null;
-    const q = quiz as any;
-    return {
-      id: q.code.toLowerCase(), code: q.code, name: q.name, subject: q.subject,
-      years: q.years, role: q.role, place: q.place, photo: q.photo,
-      didYouKnow: q.didYouKnow, works: q.works, facts: run.facts, by: q.by,
-    };
-  }, [quiz, run]);
 
   const save = () => {
     if (!fiche) return;

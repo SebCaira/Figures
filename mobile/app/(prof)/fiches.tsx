@@ -10,13 +10,14 @@ export default function ProfFiches() {
   const { session } = useSession();
   const { customQuizzes } = useData();
   const router = useRouter();
-  if (session?.role !== 'prof') return null;
 
   const groups = useMemo(() => {
     const bySubject: Record<string, number> = {};
     Object.values(customQuizzes).forEach((q) => { bySubject[q.subject] = (bySubject[q.subject] || 0) + 1; });
     return Object.entries(bySubject);
   }, [customQuizzes]);
+
+  if (session?.role !== 'prof') return null;
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={{ padding: 20, paddingTop: 56, paddingBottom: 40 }}>

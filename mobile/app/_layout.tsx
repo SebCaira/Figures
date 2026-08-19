@@ -21,6 +21,7 @@ import { SessionProvider } from '../src/lib/session';
 import { DataProvider } from '../src/lib/data';
 import { ToastProvider } from '../src/lib/toast';
 import { QuizRunProvider } from '../src/lib/quizRun';
+import { ErrorBoundary } from '../src/components/ErrorBoundary';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -49,15 +50,17 @@ export default function RootLayout() {
   if (!fontsLoaded) return <View style={{ flex: 1, backgroundColor: colors.navy }} />;
 
   return (
-    <SessionProvider>
-      <DataProvider>
-        <ToastProvider>
-          <QuizRunProvider>
-            <StatusBar style="light" />
-            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.cream } }} />
-          </QuizRunProvider>
-        </ToastProvider>
-      </DataProvider>
-    </SessionProvider>
+    <ErrorBoundary>
+      <SessionProvider>
+        <DataProvider>
+          <ToastProvider>
+            <QuizRunProvider>
+              <StatusBar style="light" />
+              <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.cream } }} />
+            </QuizRunProvider>
+          </ToastProvider>
+        </DataProvider>
+      </SessionProvider>
+    </ErrorBoundary>
   );
 }

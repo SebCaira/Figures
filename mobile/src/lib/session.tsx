@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { loadJSON, saveJSON } from './storage';
 import { supabase } from './supabase';
 
@@ -96,6 +96,8 @@ function frError(message: string): string {
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
   const [session, setSession] = useState<AppSession>(null);
+  const sessionRef = useRef<AppSession>(null);
+  sessionRef.current = session;
   const [consentAccepted, setConsentAccepted] = useState(false);
   const [a11y, setA11y] = useState<A11y>({ dys: false, large: false });
   const [onboardSeen, setOnboardSeen] = useState<OnboardSeen>({ eleve: false, prof: false });
@@ -161,18 +163,16 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       return { ...s, [ficheId]: entry };
     });
     // Push to Supabase for a logged-in student (best-effort, matches original app).
-    setSession((cur) => {
-      if (cur && cur.role === 'eleve') {
-        supabase
-          .from('progress')
-          .upsert(
-            { eleve_id: cur.eleveId, quiz_code: ficheId.toUpperCase(), best: score, total, mastered: score === total, updated_at: new Date().toISOString() },
-            { onConflict: 'eleve_id,quiz_code' }
-          )
-          .then(() => {});
-      }
-      return cur;
-    });
+    const cur = sessionRef.current;
+    if (cur && cur.role === 'eleve') {
+      supabase
+        .from('progress')
+        .upsert(
+          { eleve_id: cur.eleveId, quiz_code: ficheId.toUpperCase(), best: score, total, mastered: score === total, updated_at: new Date().toISOString() },
+          { onConflict: 'eleve_id,quiz_code' }
+        )
+        .then(() => {}, () => {});
+    }
   }, []);
 
   const masteredCount = collection.filter((f) => progress[f.id]?.mastered).length;

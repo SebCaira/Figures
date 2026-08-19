@@ -10,12 +10,13 @@ export default function Reglages() {
   const { session, a11y, toggleA11y, logout } = useSession();
   const { classes, customQuizzes } = useData();
   const router = useRouter();
-  if (session?.role !== 'prof') return null;
 
   const subjects = useMemo(
     () => Array.from(new Set(Object.values(customQuizzes).map((q) => q.subject))),
     [customQuizzes]
   );
+
+  if (session?.role !== 'prof') return null;
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={{ padding: 20, paddingTop: 56, paddingBottom: 40 }}>
