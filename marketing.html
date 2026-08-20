@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Figures — les personnages de tes cours</title>
+<meta name="description" content="Les professeurs créent des fiches de révision avec l'IA, les élèves les collectionnent en répondant à des quiz. Simple, ludique, sans compte email pour les élèves.">
+<style>
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: #ECE7DA;
+    color: #21303F;
+    font-family: -apple-system, BlinkMacSystemFont, "Public Sans", system-ui, sans-serif;
+    line-height: 1.6;
+  }
+  .serif { font-family: Georgia, "Newsreader", serif; }
+  a { color: #B0863C; }
+
+  /* ---------- top nav ---------- */
+  nav {
+    max-width: 1080px; margin: 0 auto; padding: 22px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-mark {
+    width: 34px; height: 34px; border-radius: 9px; background: #21303F; color: #F6F2E9;
+    display: flex; align-items: center; justify-content: center;
+    font-family: Georgia, "Newsreader", serif; font-size: 17px; font-weight: 600;
+  }
+  .brand-mark span { color: #B0863C; }
+  .brand-name { font-family: Georgia, "Newsreader", serif; font-size: 18px; font-weight: 600; }
+  .nav-links { display: flex; gap: 24px; font-size: 14px; }
+  .nav-links a { color: #21303F; text-decoration: none; }
+  .nav-links a:hover { color: #B0863C; }
+
+  /* ---------- hero ---------- */
+  .hero {
+    max-width: 1080px; margin: 0 auto; padding: 40px 24px 70px;
+    display: flex; align-items: center; gap: 56px;
+  }
+  .hero-copy { flex: 1; min-width: 280px; }
+  .kicker {
+    font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    color: #B0863C; margin-bottom: 14px;
+  }
+  h1 { font-family: Georgia, "Newsreader", serif; font-size: 48px; line-height: 1.08; margin: 0 0 18px; }
+  h1 .dot { color: #B0863C; }
+  .lede { font-size: 18px; color: #52504A; max-width: 440px; margin: 0 0 30px; }
+  .cta-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .store-badge {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: #21303F; color: #F6F2E9; border-radius: 12px;
+    padding: 11px 20px; font-size: 14px; font-weight: 600; text-decoration: none;
+  }
+  .store-badge svg { flex-shrink: 0; }
+  .cta-note { font-size: 13px; color: #706C5E; }
+
+  .hero-visual { flex: 1; min-width: 280px; display: flex; justify-content: center; gap: 24px; }
+
+  /* ---------- phone mockups ---------- */
+  .phone {
+    width: 220px; height: 448px; border-radius: 32px; background: #21303F;
+    padding: 8px; box-shadow: 0 24px 48px -12px rgba(33,48,63,0.35);
+  }
+  .phone.tilt-down { transform: translateY(38px) rotate(3deg); }
+  .phone-screen {
+    width: 100%; height: 100%; border-radius: 25px; background: #F6F2E9;
+    overflow: hidden; position: relative; padding: 22px 16px;
+  }
+  .screen-logo {
+    width: 40px; height: 40px; border-radius: 11px; background: #21303F; color: #F6F2E9;
+    display: flex; align-items: center; justify-content: center;
+    font-family: Georgia, "Newsreader", serif; font-size: 19px; font-weight: 600;
+    margin: 10px auto 14px;
+  }
+  .screen-logo span { color: #B0863C; }
+  .screen-kicker {
+    text-align: center; font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+    text-transform: uppercase; color: #B0863C; margin-bottom: 4px;
+  }
+  .screen-title { text-align: center; font-family: Georgia, "Newsreader", serif; font-size: 26px; font-weight: 600; }
+  .screen-title span { color: #B0863C; }
+  .screen-sub { text-align: center; font-size: 11px; color: #706C5E; margin-top: 4px; margin-bottom: 26px; }
+  .role-btn {
+    border-radius: 16px; padding: 13px 14px; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 10px; font-size: 11px;
+  }
+  .role-btn.dark { background: #21303F; color: #F6F2E9; }
+  .role-btn.light { background: #FFFCF5; border: 1px solid #E7E1D3; }
+  .role-icon { font-size: 15px; }
+  .role-title { font-family: Georgia, "Newsreader", serif; font-weight: 600; font-size: 13px; display: block; }
+  .role-sub { font-size: 9px; opacity: 0.75; display: block; margin-top: 1px; }
+
+  .fiche-title { font-family: Georgia, "Newsreader", serif; font-size: 19px; font-weight: 600; margin: 6px 0 2px; }
+  .fiche-count { font-size: 10px; color: #706C5E; margin-bottom: 14px; }
+  .fiche-card {
+    background: #FFFCF5; border: 1px solid #E7E1D3; border-radius: 13px;
+    padding: 10px; display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+  }
+  .fiche-avatar {
+    width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: Georgia, "Newsreader", serif; font-size: 11px; font-weight: 600;
+  }
+  .fiche-meta { flex: 1; }
+  .fiche-name { font-family: Georgia, "Newsreader", serif; font-size: 12px; font-weight: 600; }
+  .fiche-badge { font-size: 8px; font-weight: 700; padding: 2px 7px; border-radius: 999px; }
+
+  /* ---------- sections ---------- */
+  section { max-width: 1080px; margin: 0 auto; padding: 64px 24px; }
+  .section-kicker {
+    font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    color: #B0863C; text-align: center; margin-bottom: 10px;
+  }
+  h2 { font-family: Georgia, "Newsreader", serif; font-size: 32px; text-align: center; margin: 0 0 44px; }
+
+  .cols {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+  }
+  .col-card {
+    background: #FFFCF5; border: 1px solid #E7E1D3; border-radius: 20px; padding: 28px;
+  }
+  .col-card .tag {
+    display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.4px;
+    text-transform: uppercase; padding: 4px 10px; border-radius: 999px; margin-bottom: 14px;
+  }
+  .tag.prof { background: #F3E9D6; color: #B0863C; }
+  .tag.eleve { background: #E6F0EC; color: #2E7D6B; }
+  .col-card h3 { font-family: Georgia, "Newsreader", serif; font-size: 20px; margin: 0 0 10px; }
+  .col-card ol { margin: 0; padding-left: 20px; font-size: 14.5px; color: #3A3A34; }
+  .col-card li { margin-bottom: 8px; }
+
+  .feature-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+  }
+  .feature {
+    background: #FFFCF5; border: 1px solid #E7E1D3; border-radius: 18px; padding: 24px;
+  }
+  .feature-mark {
+    width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    font-size: 18px; margin-bottom: 14px;
+  }
+  .feature h4 { font-family: Georgia, "Newsreader", serif; font-size: 16px; margin: 0 0 6px; }
+  .feature p { font-size: 13.5px; color: #52504A; margin: 0; }
+
+  .trust {
+    background: #21303F; color: #F6F2E9; border-radius: 24px; padding: 44px 40px;
+    display: flex; align-items: center; gap: 40px; flex-wrap: wrap;
+  }
+  .trust-copy { flex: 2; min-width: 260px; }
+  .trust h3 { font-family: Georgia, "Newsreader", serif; font-size: 22px; margin: 0 0 10px; }
+  .trust p { font-size: 14px; color: rgba(246,242,233,0.78); margin: 0; max-width: 480px; }
+  .trust-links { flex: 1; min-width: 180px; display: flex; flex-direction: column; gap: 10px; }
+  .trust-links a {
+    color: #F6F2E9; font-size: 13.5px; text-decoration: none; display: flex; align-items: center; gap: 8px;
+  }
+  .trust-links a:hover { color: #B0863C; }
+
+  footer {
+    max-width: 1080px; margin: 0 auto; padding: 40px 24px 60px;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+    font-size: 12.5px; color: #706C5E; border-top: 1px solid #E0D9C8;
+  }
+  footer a { color: #706C5E; }
+  footer a:hover { color: #B0863C; }
+
+  @media (max-width: 860px) {
+    .hero { flex-direction: column; text-align: center; }
+    .lede { margin-left: auto; margin-right: auto; }
+    .cta-row { justify-content: center; }
+    .hero-visual { margin-top: 16px; }
+    .phone.tilt-down { display: none; }
+    .cols { grid-template-columns: 1fr; }
+    .feature-grid { grid-template-columns: 1fr; }
+    h1 { font-size: 36px; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">
+    <div class="brand-mark">F<span>.</span></div>
+    <div class="brand-name">Figures</div>
+  </div>
+  <div class="nav-links">
+    <a href="#comment-ca-marche">Comment ça marche</a>
+    <a href="#fonctionnalites">Fonctionnalités</a>
+    <a href="./support.html">Support</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-copy">
+    <div class="kicker">Application de révision</div>
+    <h1>Les personnages<br>de tes cours<span class="dot">.</span></h1>
+    <p class="lede">Les professeurs créent des fiches de révision avec l'IA en quelques secondes. Les élèves les collectionnent en répondant à des quiz, sans avoir besoin d'une adresse email.</p>
+    <div class="cta-row">
+      <span class="store-badge">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.53 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" fill="#F6F2E9"/></svg>
+        Bientôt sur l'App Store
+      </span>
+      <span class="cta-note">Gratuit pour les classes.</span>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="phone">
+      <div class="phone-screen">
+        <div class="screen-logo">F<span>.</span></div>
+        <div class="screen-kicker">Bienvenue sur</div>
+        <div class="screen-title">Figures<span>.</span></div>
+        <div class="screen-sub">les personnages de tes cours</div>
+        <div class="role-btn dark">
+          <span class="role-icon">✸</span>
+          <span>
+            <span class="role-title">Espace élève</span>
+            <span class="role-sub">Je collectionne mes fiches</span>
+          </span>
+        </div>
+        <div class="role-btn light">
+          <span class="role-icon">✎</span>
+          <span>
+            <span class="role-title">Espace professeur</span>
+            <span class="role-sub">Je crée les personnages</span>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="phone tilt-down">
+      <div class="phone-screen">
+        <div class="fiche-title">Mes fiches</div>
+        <div class="fiche-count">3 personnages collectés</div>
+        <div class="fiche-card">
+          <div class="fiche-avatar" style="background:#F3EADD;color:#A8743A;">MC</div>
+          <div class="fiche-meta">
+            <div class="fiche-name">Marie CURIE</div>
+          </div>
+          <div class="fiche-badge" style="background:#E6F2EC;color:#1F5C4D;">Maîtrisée</div>
+        </div>
+        <div class="fiche-card">
+          <div class="fiche-avatar" style="background:#E4EDF5;color:#2A6F9E;">FC</div>
+          <div class="fiche-meta">
+            <div class="fiche-name">Frédéric CHOPIN</div>
+          </div>
+          <div class="fiche-badge" style="background:#F7EEDF;color:#8B601B;">À revoir</div>
+        </div>
+        <div class="fiche-card">
+          <div class="fiche-avatar" style="background:#F4E6E8;color:#8C3B4A;">VH</div>
+          <div class="fiche-meta">
+            <div class="fiche-name">Victor HUGO</div>
+          </div>
+          <div class="fiche-badge" style="background:#E6F2EC;color:#1F5C4D;">Maîtrisée</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="comment-ca-marche">
+  <div class="section-kicker">Comment ça marche</div>
+  <h2>Deux espaces, une classe</h2>
+  <div class="cols">
+    <div class="col-card">
+      <span class="tag prof">Professeur</span>
+      <h3>Créer et partager</h3>
+      <ol>
+        <li>Tape le nom d'un personnage ou d'une notion du programme.</li>
+        <li>L'IA génère automatiquement la fiche et son quiz.</li>
+        <li>Crée une classe, partage le code à tes élèves.</li>
+        <li>Suis la progression de chacun, en un coup d'œil.</li>
+      </ol>
+    </div>
+    <div class="col-card">
+      <span class="tag eleve">Élève</span>
+      <h3>Réviser en collectionnant</h3>
+      <ol>
+        <li>Rejoins ta classe avec le code — pas d'email à donner.</li>
+        <li>Réponds aux quiz de tes fiches assignées.</li>
+        <li>Collectionne chaque fiche réussie.</li>
+        <li>Débloque des badges au fil de tes révisions.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section id="fonctionnalites">
+  <div class="section-kicker">Fonctionnalités</div>
+  <h2>Pensé pour la classe</h2>
+  <div class="feature-grid">
+    <div class="feature">
+      <div class="feature-mark" style="background:#F3E9D6;">🪄</div>
+      <h4>Fiches générées par IA</h4>
+      <p>Une fiche de révision complète et son quiz, prêts en quelques secondes à partir d'un simple nom.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-mark" style="background:#E6F2EC;">🏅</div>
+      <h4>Badges &amp; progression</h4>
+      <p>Chaque quiz réussi rapproche l'élève d'un nouveau badge — la révision devient un jeu de collection.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-mark" style="background:#E4EDF5;">👥</div>
+      <h4>Classes &amp; co-enseignement</h4>
+      <p>Un code par classe, un suivi de progression pour chaque élève, et un second professeur peut co-animer.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-mark" style="background:#F4E6E8;">🔤</div>
+      <h4>Accessibilité intégrée</h4>
+      <p>Police adaptée aux troubles dys et mode "Grand texte", pour un confort de lecture pour tous les élèves.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-mark" style="background:#ECE6F5;">🔒</div>
+      <h4>Aucune donnée superflue</h4>
+      <p>Les élèves rejoignent avec un prénom, un nom et un mot de passe — jamais d'adresse email requise.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-mark" style="background:#E5F0E9;">🇪🇺</div>
+      <h4>Hébergement européen</h4>
+      <p>Toutes les données sont hébergées de façon sécurisée en Europe, conformément au RGPD.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="trust">
+    <div class="trust-copy">
+      <h3>Une question avant de commencer ?</h3>
+      <p>Consulte notre politique de confidentialité ou écris-nous directement — on répond vite.</p>
+    </div>
+    <div class="trust-links">
+      <a href="./support.html">→ Support &amp; questions fréquentes</a>
+      <a href="./confidentialite.html">→ Politique de confidentialité</a>
+      <a href="mailto:caira.sebastien@gmail.com">→ caira.sebastien@gmail.com</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div>© 2026 Sébastien Caira — Figures</div>
+  <div><a href="./confidentialite.html">Confidentialité</a> &nbsp;·&nbsp; <a href="./support.html">Support</a></div>
+</footer>
+
+</body>
+</html>
