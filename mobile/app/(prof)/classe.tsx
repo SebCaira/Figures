@@ -125,7 +125,12 @@ export default function Classe() {
                   {c.students.map((s) => (
                     <View key={s.id} style={styles.studentRow}>
                       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Text style={styles.studentName}>{s.name}</Text>
+                        <Pressable
+                          style={{ flex: 1 }}
+                          onPress={() => router.push({ pathname: '/student/[id]', params: { id: s.id, classId: c.id } })}
+                        >
+                          <Text style={styles.studentName}>{s.name} ›</Text>
+                        </Pressable>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                           <Text style={styles.studentPct}>{s.fiches} fiches · {s.pct}</Text>
                           <Pressable onPress={() => removeStudent(c.id, s.id)}>

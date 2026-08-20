@@ -3,7 +3,11 @@ import { supabase } from './supabase';
 import { useSession } from './session';
 import { QUIZZES, SHARED_QUIZ, QuizDef, Question } from './seed';
 
-export type RosterStudent = { id: string; name: string; fiches: number; pct: string };
+export type StudentProgressEntry = { quizCode: string; best: number; total: number; mastered: boolean };
+export type RosterStudent = {
+  id: string; name: string; fiches: number; pct: string;
+  progressDetails: StudentProgressEntry[];
+};
 export type ClassGroup = {
   id: string;
   code: string;
@@ -92,12 +96,17 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         const { data: eleves } = await supabase.from('eleves').select('id, prenom, nom').eq('class_id', c.id);
         const students: RosterStudent[] = [];
         for (const e of eleves || []) {
-          const { data: progRows } = await supabase.from('progress').select('best, total').eq('eleve_id', e.id);
+          const { data: progRows } = await supabase.from('progress').select('quiz_code, best, total, mastered').eq('eleve_id', e.id);
           const rows = progRows || [];
           const pct = rows.length
             ? Math.round((rows.reduce((sum: number, r: any) => sum + (r.total ? r.best / r.total : 0), 0) / rows.length) * 100)
             : 0;
-          students.push({ id: e.id, name: `${e.prenom} ${e.nom}`, fiches: rows.length, pct: `${pct}%` });
+          students.push({
+            id: e.id, name: `${e.prenom} ${e.nom}`, fiches: rows.length, pct: `${pct}%`,
+            progressDetails: rows.map((r: any) => ({
+              quizCode: r.quiz_code, best: r.best, total: r.total, mastered: r.mastered,
+            })),
+          });
         }
         result.push({ id: c.id, code: c.code, name: c.name, teacherId: c.teacher_id, teachers: teacherNames, students });
       }
