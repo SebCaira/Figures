@@ -1,13 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from '../src/components/AppText';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { colors, fonts, radii } from '../src/theme/theme';
 import { useSession, StudentJoinResult } from '../src/lib/session';
+import { loadJSON, saveJSON } from '../src/lib/storage';
 import { BackButton, PrimaryButton, TextField } from '../src/components/ui';
 
 type Role = 'eleve' | 'prof';
 type EleveStep = 'join' | 'setup' | 'login' | 'reset';
+
+const K_LAST_JOIN = 'figures.lastEleveJoin.v1';
+type LastJoin = { code: string; prenom: string; nom: string };
 
 export default function Auth() {
   const { role: roleParam } = useLocalSearchParams<{ role: string }>();
@@ -36,11 +40,22 @@ export default function Auth() {
   const soft = role === 'eleve' ? colors.studentSoft : colors.teacherSoft;
   const icon = role === 'eleve' ? '✸' : '✎';
 
+  // Remember the last class code/prénom/nom used on this device, so a
+  // returning student only has to type their password — re-typing the class
+  // code every time was the main friction point in testing.
+  useEffect(() => {
+    if (role !== 'eleve') return;
+    loadJSON<LastJoin | null>(K_LAST_JOIN, null).then((last) => {
+      if (last) { setCode(last.code); setPrenom(last.prenom); setNom(last.nom); }
+    });
+  }, [role]);
+
   const goEleveSpace = () => router.replace('/(eleve)/quizz');
 
   const submitJoin = async () => {
     const result = await studentJoin(code, prenom, nom);
     if (!result) return;
+    saveJSON(K_LAST_JOIN, { code: code.trim(), prenom: prenom.trim(), nom: nom.trim() });
     setJoinInfo(result);
     setEleveStep(result.needsPasswordSetup ? 'setup' : 'login');
   };
