@@ -25,8 +25,8 @@ type Ctx = {
   refreshProfData: () => Promise<void>;
   createClass: (name: string) => Promise<ClassGroup | null>;
   joinAsCoTeacher: (code: string) => Promise<{ ok: boolean; message: string }>;
-  removeStudent: (classId: string, studentId: string) => void;
-  deleteClass: (classId: string) => void;
+  removeStudent: (classId: string, studentId: string) => Promise<void>;
+  deleteClass: (classId: string) => Promise<void>;
   customQuizzes: Record<string, QuizDef>;
   loadingQuizzes: boolean;
   refreshClassQuizzes: () => Promise<void>;
@@ -174,14 +174,25 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     return { ok: true, message: 'Tu co-animes désormais cette classe ✓' };
   }, [session, refreshProfData]);
 
-  const removeStudent = useCallback((classId: string, studentId: string) => {
+  const removeStudent = useCallback(async (classId: string, studentId: string) => {
     setClasses((s) => s.map((c) => c.id === classId ? { ...c, students: c.students.filter((st) => st.id !== studentId) } : c));
+    // Real deletes, not just a local hide — otherwise the student reappears on
+    // the next sync (app restart, other device), which also breaks the RGPD
+    // erasure promise made in the privacy policy.
+    await supabase.from('progress').delete().eq('eleve_id', studentId);
+    await supabase.from('eleves').delete().eq('id', studentId);
   }, []);
 
-  const deleteClass = useCallback((classId: string) => {
+  const deleteClass = useCallback(async (classId: string) => {
     setClasses((s) => s.filter((c) => c.id !== classId));
     setAssignments((s) => s.filter((a) => a.classId !== classId));
-    supabase.from('assignments').delete().eq('class_id', classId).then(() => {});
+    const { data: eleves } = await supabase.from('eleves').select('id').eq('class_id', classId);
+    const eleveIds = (eleves || []).map((e: any) => e.id);
+    if (eleveIds.length) await supabase.from('progress').delete().in('eleve_id', eleveIds);
+    await supabase.from('eleves').delete().eq('class_id', classId);
+    await supabase.from('assignments').delete().eq('class_id', classId);
+    await supabase.from('class_teachers').delete().eq('class_id', classId);
+    await supabase.from('classes').delete().eq('id', classId);
   }, []);
 
   const allQuizzes = useMemo<Record<string, QuizDef>>(() => ({

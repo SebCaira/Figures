@@ -52,7 +52,7 @@ export default function Auth() {
       return;
     }
     const ok = await studentSetPassword(
-      joinInfo.eleveId, newPassword, eleveStep === 'reset' ? resetCode.trim() : undefined
+      joinInfo.eleveId, newPassword, eleveStep === 'reset' ? resetCode.trim().toUpperCase() : undefined
     );
     if (!ok) return;
     finalizeStudentSession({ ...joinInfo, prenom: prenom.trim(), nom: nom.trim() });

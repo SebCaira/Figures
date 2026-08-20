@@ -2,6 +2,7 @@ import React from 'react';
 import { Pressable, StyleSheet, View, ViewStyle, TextStyle, ActivityIndicator, TextInput } from 'react-native';
 import { Text } from './AppText';
 import { colors, fonts, radii } from '../theme/theme';
+import { useSession } from '../lib/session';
 
 export function Screen({ children, style }: { children: React.ReactNode; style?: ViewStyle }) {
   return <View style={[styles.screen, style]}>{children}</View>;
@@ -42,6 +43,7 @@ export function TextField({
   secureTextEntry?: boolean; autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
   keyboardType?: 'default' | 'email-address'; style?: ViewStyle & TextStyle;
 }) {
+  const { a11y } = useSession();
   return (
     <TextInput
       value={value}
@@ -51,7 +53,7 @@ export function TextField({
       secureTextEntry={secureTextEntry}
       autoCapitalize={autoCapitalize ?? 'sentences'}
       keyboardType={keyboardType ?? 'default'}
-      style={[styles.input, style]}
+      style={[styles.input, a11y.dys && styles.inputDys, style]}
     />
   );
 }
@@ -102,6 +104,7 @@ const styles = StyleSheet.create({
     borderRadius: radii.md, paddingHorizontal: 14, paddingVertical: 13,
     fontFamily: fonts.sans, fontSize: 15, color: colors.navy,
   },
+  inputDys: { fontFamily: 'AtkinsonHyperlegible_400Regular', letterSpacing: 0.3 },
   chip: {
     borderWidth: 1, borderRadius: radii.pill, paddingVertical: 8, paddingHorizontal: 14, marginRight: 8, marginBottom: 8,
   },
