@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from '../../src/components/AppText';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
+import { useCallback } from 'react';
 import { colors, fonts, radii, subjectMeta } from '../../src/theme/theme';
 import { useSession } from '../../src/lib/session';
 import { useData } from '../../src/lib/data';
@@ -13,8 +14,13 @@ import { Card, Chip, PrimaryButton, SectionTitle, TextField } from '../../src/co
 
 export default function Quizz() {
   const { session, collection, progress } = useSession();
-  const { allQuizzes, assignments } = useData();
+  const { allQuizzes, assignments, refreshClassQuizzes } = useData();
   const { startQuiz } = useQuizRun();
+
+  // Assignments/personnages a teacher just published elsewhere aren't pushed to
+  // this device — refetch every time this tab regains focus so they show up
+  // without requiring a full logout/login.
+  useFocusEffect(useCallback(() => { refreshClassQuizzes(); }, [refreshClassQuizzes]));
   const { flashToast } = useToast();
   const router = useRouter();
   const [code, setCode] = useState('');

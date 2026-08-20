@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from '../../src/components/AppText';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import * as Clipboard from 'expo-clipboard';
 import { colors, fonts, radii } from '../../src/theme/theme';
 import { useSession } from '../../src/lib/session';
@@ -11,9 +11,13 @@ import { Card, Chip, PrimaryButton, SectionTitle, TextField } from '../../src/co
 
 export default function Classe() {
   const { session } = useSession();
-  const { classes, customQuizzes, assignments, createClass, joinAsCoTeacher, removeStudent, deleteClass, assignQuiz, generateResetCode } = useData();
+  const { classes, customQuizzes, assignments, createClass, joinAsCoTeacher, removeStudent, deleteClass, assignQuiz, generateResetCode, refreshProfData } = useData();
   const { flashToast } = useToast();
   const router = useRouter();
+
+  // Roster/progress/co-teacher changes made elsewhere (a student finishing a
+  // quiz, a co-teacher joining) aren't pushed here — refetch on every focus.
+  useFocusEffect(useCallback(() => { refreshProfData(); }, [refreshProfData]));
 
   const [newName, setNewName] = useState('');
   const [joinCode, setJoinCode] = useState('');

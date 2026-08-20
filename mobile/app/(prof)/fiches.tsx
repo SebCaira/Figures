@@ -1,7 +1,7 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from '../../src/components/AppText';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { colors, fonts, radii, subjectMeta } from '../../src/theme/theme';
 import { useSession } from '../../src/lib/session';
 import { useData } from '../../src/lib/data';
@@ -9,8 +9,10 @@ import { PrimaryButton } from '../../src/components/ui';
 
 export default function ProfFiches() {
   const { session } = useSession();
-  const { customQuizzes } = useData();
+  const { customQuizzes, refreshProfData } = useData();
   const router = useRouter();
+
+  useFocusEffect(useCallback(() => { refreshProfData(); }, [refreshProfData]));
 
   const groups = useMemo(() => {
     const bySubject: Record<string, number> = {};
