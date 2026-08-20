@@ -64,7 +64,7 @@ export default function RootLayout() {
         <DataProvider>
           <ToastProvider>
             <QuizRunProvider>
-              <StatusBar style="light" />
+              <StatusBar style="light" hidden />
               <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.cream } }} />
             </QuizRunProvider>
           </ToastProvider>
