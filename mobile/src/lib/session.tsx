@@ -246,11 +246,13 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         p_class_code: code.trim(), p_prenom: prenom.trim(), p_nom: nom.trim(),
       });
       if (error || !data?.length) {
-        setAuthError(
-          error?.message?.includes('CLASS_NOT_FOUND')
-            ? "Ce code de classe n'existe pas. Vérifie auprès de ton professeur."
-            : 'Impossible de te rejoindre à la classe. Réessaie.'
-        );
+        let msg = 'Impossible de te rejoindre à la classe. Réessaie.';
+        if (error?.message?.includes('CLASS_NOT_FOUND')) {
+          msg = "Ce code de classe n'existe pas. Vérifie auprès de ton professeur.";
+        } else if (error?.message?.includes('CLASS_ARCHIVED')) {
+          msg = "Cette classe est fermée. Demande à ton professeur le nouveau code de classe.";
+        }
+        setAuthError(msg);
         return null;
       }
       const row = data[0];

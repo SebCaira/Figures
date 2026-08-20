@@ -15,6 +15,7 @@ export type ClassGroup = {
   teacherId: string;
   teachers: string[];
   students: RosterStudent[];
+  archivedAt: string | null;
 };
 
 export type Assignment = { id: string; classId: string; quizCode: string; due: string };
@@ -27,6 +28,8 @@ type Ctx = {
   joinAsCoTeacher: (code: string) => Promise<{ ok: boolean; message: string }>;
   removeStudent: (classId: string, studentId: string) => Promise<void>;
   deleteClass: (classId: string) => Promise<void>;
+  archiveClass: (classId: string) => Promise<void>;
+  reopenClass: (classId: string) => Promise<void>;
   customQuizzes: Record<string, QuizDef>;
   loadingQuizzes: boolean;
   refreshClassQuizzes: () => Promise<void>;
@@ -76,12 +79,12 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     setLoadingClasses(true);
     try {
       const uid = session.uid;
-      const { data: owned } = await supabase.from('classes').select('id, code, name, teacher_id').eq('teacher_id', uid);
+      const { data: owned } = await supabase.from('classes').select('id, code, name, teacher_id, archived_at').eq('teacher_id', uid);
       const { data: coRows } = await supabase.from('class_teachers').select('class_id').eq('teacher_id', uid);
       const coClassIds = (coRows || []).map((r: any) => r.class_id);
       let coClasses: any[] = [];
       if (coClassIds.length) {
-        const { data } = await supabase.from('classes').select('id, code, name, teacher_id').in('id', coClassIds);
+        const { data } = await supabase.from('classes').select('id, code, name, teacher_id, archived_at').in('id', coClassIds);
         coClasses = data || [];
       }
       const allClassRows = [...(owned || []), ...coClasses];
@@ -108,7 +111,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             })),
           });
         }
-        result.push({ id: c.id, code: c.code, name: c.name, teacherId: c.teacher_id, teachers: teacherNames, students });
+        result.push({ id: c.id, code: c.code, name: c.name, teacherId: c.teacher_id, teachers: teacherNames, students, archivedAt: c.archived_at });
       }
       setClasses(result);
 
@@ -155,7 +158,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     const { data, error } = await supabase
       .from('classes').insert({ code, name, teacher_id: session.uid }).select('id, code, name, teacher_id').single();
     if (error || !data) return null;
-    const cls: ClassGroup = { id: data.id, code: data.code, name: data.name, teacherId: data.teacher_id, teachers: [session.prenom], students: [] };
+    const cls: ClassGroup = { id: data.id, code: data.code, name: data.name, teacherId: data.teacher_id, teachers: [session.prenom], students: [], archivedAt: null };
     setClasses((s) => [...s, cls]);
     return cls;
   }, [session]);
@@ -193,6 +196,21 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     await supabase.from('assignments').delete().eq('class_id', classId);
     await supabase.from('class_teachers').delete().eq('class_id', classId);
     await supabase.from('classes').delete().eq('id', classId);
+  }, []);
+
+  // "Close" a class at year-end without erasing anything: students, their
+  // synced progress, and their on-device collection all survive — only new
+  // students are blocked from joining with the old code (see eleve_join).
+  // Distinct from deleteClass, which is the real RGPD erasure path.
+  const archiveClass = useCallback(async (classId: string) => {
+    const now = new Date().toISOString();
+    setClasses((s) => s.map((c) => c.id === classId ? { ...c, archivedAt: now } : c));
+    await supabase.from('classes').update({ archived_at: now }).eq('id', classId);
+  }, []);
+
+  const reopenClass = useCallback(async (classId: string) => {
+    setClasses((s) => s.map((c) => c.id === classId ? { ...c, archivedAt: null } : c));
+    await supabase.from('classes').update({ archived_at: null }).eq('id', classId);
   }, []);
 
   const allQuizzes = useMemo<Record<string, QuizDef>>(() => ({
@@ -241,7 +259,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
   const value: Ctx = {
     classes, loadingClasses, refreshProfData, createClass, joinAsCoTeacher,
-    removeStudent, deleteClass, customQuizzes, loadingQuizzes, refreshClassQuizzes,
+    removeStudent, deleteClass, archiveClass, reopenClass, customQuizzes, loadingQuizzes, refreshClassQuizzes,
     allQuizzes, publishQuiz, assignments, assignQuiz, generateResetCode,
   };
 
