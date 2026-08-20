@@ -1,5 +1,6 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View, ViewStyle, TextStyle, ActivityIndicator, TextInput } from 'react-native';
+import { Pressable, StyleSheet, View, ViewStyle, TextStyle, ActivityIndicator, TextInput } from 'react-native';
+import { Text } from './AppText';
 import { colors, fonts, radii } from '../theme/theme';
 
 export function Screen({ children, style }: { children: React.ReactNode; style?: ViewStyle }) {

@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Text } from './AppText';
 import { colors, fonts, radii } from '../theme/theme';
 import { useSession } from '../lib/session';
 import { PrimaryButton } from './ui';

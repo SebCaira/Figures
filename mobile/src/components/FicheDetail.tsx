@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Text } from './AppText';
 import { colors, fonts, radii, subjectMeta } from '../theme/theme';
 import { Fiche, ProgressEntry } from '../lib/session';
 import { FicheAvatar } from './FicheCard';

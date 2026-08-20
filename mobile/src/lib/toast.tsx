@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useRef, useState } from 'react';
-import { Animated, StyleSheet, Text } from 'react-native';
+import { Animated, StyleSheet } from 'react-native';
+import { Text } from '../components/AppText';
 import { colors, fonts, radii } from '../theme/theme';
 
 type Ctx = { flashToast: (msg: string) => void };

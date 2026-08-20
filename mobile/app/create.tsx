@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, View } from 'react-native';
+import { Text } from '../src/components/AppText';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { colors, fonts, radii, subjectMeta, SUBJECTS } from '../src/theme/theme';
 import { useSession } from '../src/lib/session';

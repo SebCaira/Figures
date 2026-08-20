@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { Text } from '../../src/components/AppText';
 import { useRouter } from 'expo-router';
 import { colors, fonts, subjectMeta } from '../../src/theme/theme';
 import { useSession } from '../../src/lib/session';

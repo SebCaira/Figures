@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '../src/components/AppText';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { colors, fonts, radii, subjectMeta } from '../src/theme/theme';
 import { useSession } from '../src/lib/session';

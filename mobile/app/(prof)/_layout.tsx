@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text } from 'react-native';
+import { Text } from '../../src/components/AppText';
 import { Tabs } from 'expo-router';
 import { colors, fonts } from '../../src/theme/theme';
 
