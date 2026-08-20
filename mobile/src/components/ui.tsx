@@ -19,6 +19,9 @@ export function PrimaryButton({
     <Pressable
       onPress={onPress}
       disabled={disabled || loading}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ disabled: disabled || loading, busy: loading }}
       style={({ pressed }) => [
         styles.btn,
         dark ? styles.btnDark : styles.btnLight,
@@ -65,6 +68,9 @@ export function Chip({
   return (
     <Pressable
       onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ selected: !!active }}
       style={[
         styles.chip,
         active ? { backgroundColor: accent, borderColor: accent } : { backgroundColor: colors.cardWhite, borderColor: colors.border },
@@ -81,7 +87,7 @@ export function SectionTitle({ children, style }: { children: React.ReactNode; s
 
 export function BackButton({ onPress }: { onPress: () => void }) {
   return (
-    <Pressable onPress={onPress} style={styles.backBtn}>
+    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel="Retour" style={styles.backBtn}>
       <Text style={styles.backBtnText}>‹ Retour</Text>
     </Pressable>
   );

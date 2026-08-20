@@ -7,13 +7,17 @@ export const colors = {
   goldSoft: '#F3E9D6',
   border: '#E7E1D3',
   dividerLight: '#F0EBDE',
-  muted: '#8A8675',
-  mutedBlue: '#6E7884',
-  placeholder: '#A7AEB4',
+  // Darkened from the original design pass so every text color hits at
+  // least a 4.5:1 contrast ratio against the app's light backgrounds
+  // (cream #F6F2E9, cardWhite #FFFCF5) — see Apple's Accessibility
+  // Nutrition Label "Sufficient Contrast" criteria.
+  muted: '#706C5E',
+  mutedBlue: '#5F6874',
+  placeholder: '#646B71',
   green: '#2E7D6B',
   greenSoft: '#E6F2EC',
   greenDark: '#1F5C4D',
-  amber: '#9A6B1E',
+  amber: '#8B601B',
   amberSoft: '#F7EEDF',
   red: '#B5503E',
   redDark: '#8E3A2C',

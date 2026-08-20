@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useRef, useState } from 'react';
-import { Animated, StyleSheet } from 'react-native';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { AccessibilityInfo, Animated, StyleSheet } from 'react-native';
 import { Text } from '../components/AppText';
 import { colors, fonts, radii } from '../theme/theme';
 
@@ -10,13 +10,20 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [msg, setMsg] = useState('');
   const opacity = useRef(new Animated.Value(0)).current;
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reduceMotion = useRef(false);
+
+  useEffect(() => {
+    AccessibilityInfo.isReduceMotionEnabled().then((v) => { reduceMotion.current = v; });
+    const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', (v) => { reduceMotion.current = v; });
+    return () => sub.remove();
+  }, []);
 
   const flashToast = (m: string) => {
     setMsg(m);
     if (timer.current) clearTimeout(timer.current);
-    Animated.timing(opacity, { toValue: 1, duration: 180, useNativeDriver: true }).start();
+    Animated.timing(opacity, { toValue: 1, duration: reduceMotion.current ? 0 : 180, useNativeDriver: true }).start();
     timer.current = setTimeout(() => {
-      Animated.timing(opacity, { toValue: 0, duration: 220, useNativeDriver: true }).start();
+      Animated.timing(opacity, { toValue: 0, duration: reduceMotion.current ? 0 : 220, useNativeDriver: true }).start();
     }, 1900);
   };
 

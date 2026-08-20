@@ -104,7 +104,13 @@ export default function Classe() {
           const classAssignments = assignments.filter((a) => a.classId === c.id);
           return (
             <View key={c.id} style={styles.classCard}>
-              <Pressable style={styles.classHeader} onPress={() => setExpanded(isOpen ? null : c.id)}>
+              <Pressable
+                style={styles.classHeader}
+                onPress={() => setExpanded(isOpen ? null : c.id)}
+                accessibilityRole="button"
+                accessibilityLabel={`${c.name}, ${c.students.length} élève${c.students.length > 1 ? 's' : ''}, code ${c.code}${c.archivedAt ? ', fermée' : ''}`}
+                accessibilityState={{ expanded: isOpen }}
+              >
                 <View style={{ flex: 1 }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                     <Text style={styles.className}>{c.name}</Text>
@@ -152,12 +158,18 @@ export default function Classe() {
                         <Pressable
                           style={{ flex: 1 }}
                           onPress={() => router.push({ pathname: '/student/[id]', params: { id: s.id, classId: c.id } })}
+                          accessibilityRole="button"
+                          accessibilityLabel={`Voir la fiche de ${s.name}, ${s.fiches} fiches, ${s.pct}`}
                         >
                           <Text style={styles.studentName}>{s.name} ›</Text>
                         </Pressable>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                           <Text style={styles.studentPct}>{s.fiches} fiches · {s.pct}</Text>
-                          <Pressable onPress={() => removeStudent(c.id, s.id)}>
+                          <Pressable
+                            onPress={() => removeStudent(c.id, s.id)}
+                            accessibilityRole="button"
+                            accessibilityLabel={`Retirer ${s.name} de la classe`}
+                          >
                             <Text style={styles.remove}>×</Text>
                           </Pressable>
                         </View>
