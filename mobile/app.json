@@ -13,7 +13,8 @@
       "bundleIdentifier": "com.figurescollege.app",
       "infoPlist": {
         "UIStatusBarHidden": true,
-        "UIViewControllerBasedStatusBarAppearance": false
+        "UIViewControllerBasedStatusBarAppearance": false,
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
