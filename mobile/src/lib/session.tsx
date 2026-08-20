@@ -75,8 +75,21 @@ type Ctx = {
   setAuthError: (s: string) => void;
   teacherSignup: (name: string, email: string, password: string) => Promise<boolean>;
   teacherLogin: (email: string, password: string) => Promise<boolean>;
-  studentJoin: (code: string, prenom: string, nom: string) => Promise<boolean>;
+  studentJoin: (code: string, prenom: string, nom: string) => Promise<StudentJoinResult | null>;
+  studentSetPassword: (eleveId: string, password: string, resetCode?: string) => Promise<boolean>;
+  studentVerifyPassword: (eleveId: string, password: string) => Promise<boolean>;
+  finalizeStudentSession: (info: {
+    eleveId: string; classId: string; className: string; classCode: string; prenom: string; nom: string;
+  }) => void;
   logout: () => void;
+};
+
+export type StudentJoinResult = {
+  eleveId: string;
+  classId: string;
+  className: string;
+  classCode: string;
+  needsPasswordSetup: boolean;
 };
 
 const AppCtx = createContext<Ctx | null>(null);
@@ -227,31 +240,82 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     try {
       if (!prenom.trim() || !nom.trim() || !code.trim()) {
         setAuthError('Renseigne le code de la classe, ton prénom et ton nom.');
+        return null;
+      }
+      const { data, error } = await supabase.rpc('eleve_join', {
+        p_class_code: code.trim(), p_prenom: prenom.trim(), p_nom: nom.trim(),
+      });
+      if (error || !data?.length) {
+        setAuthError(
+          error?.message?.includes('CLASS_NOT_FOUND')
+            ? "Ce code de classe n'existe pas. Vérifie auprès de ton professeur."
+            : 'Impossible de te rejoindre à la classe. Réessaie.'
+        );
+        return null;
+      }
+      const row = data[0];
+      return {
+        eleveId: row.eleve_id as string,
+        classId: row.class_id as string,
+        className: row.class_name as string,
+        classCode: row.class_code as string,
+        needsPasswordSetup: row.needs_password_setup as boolean,
+      };
+    } catch (e: any) {
+      setAuthError(e?.message || 'Erreur réseau. Réessaie.');
+      return null;
+    } finally { setAuthLoading(false); }
+  }, []);
+
+  const studentSetPassword = useCallback(async (eleveId: string, password: string, resetCode?: string) => {
+    setAuthError(''); setAuthLoading(true);
+    try {
+      if (password.length < 4) {
+        setAuthError('Le mot de passe doit contenir au moins 4 caractères.');
         return false;
       }
-      const upCode = code.trim().toUpperCase();
-      const { data: cls, error: clsErr } = await supabase
-        .from('classes').select('id, code, name, teacher_id').ilike('code', upCode).maybeSingle();
-      if (clsErr || !cls) { setAuthError("Ce code de classe n'existe pas. Vérifie auprès de ton professeur."); return false; }
-      const nomUp = nom.trim().toUpperCase();
-      const { data: existing } = await supabase
-        .from('eleves').select('id').eq('class_id', cls.id).eq('prenom', prenom.trim()).eq('nom', nomUp).maybeSingle();
-      let eleveId = existing?.id;
-      if (!eleveId) {
-        const { data: inserted, error: insErr } = await supabase
-          .from('eleves').insert({ class_id: cls.id, prenom: prenom.trim(), nom: nomUp }).select('id').single();
-        if (insErr || !inserted) { setAuthError('Impossible de te rejoindre à la classe. Réessaie.'); return false; }
-        eleveId = inserted.id;
-      }
-      setSession({
-        role: 'eleve', prenom: prenom.trim(), nom: nomUp,
-        classe: cls.name, classCode: cls.code, classId: cls.id, eleveId,
+      const { error } = await supabase.rpc('eleve_set_password', {
+        p_eleve_id: eleveId, p_new_password: password, p_reset_code: resetCode || null,
       });
+      if (error) {
+        setAuthError(
+          error.message?.includes('RESET_CODE_INVALID')
+            ? "Ce code de réinitialisation n'est pas valide ou a expiré. Demande-en un nouveau à ton professeur."
+            : "Impossible d'enregistrer ce mot de passe. Réessaie."
+        );
+        return false;
+      }
       return true;
     } catch (e: any) {
       setAuthError(e?.message || 'Erreur réseau. Réessaie.');
       return false;
     } finally { setAuthLoading(false); }
+  }, []);
+
+  const studentVerifyPassword = useCallback(async (eleveId: string, password: string) => {
+    setAuthError(''); setAuthLoading(true);
+    try {
+      const { data, error } = await supabase.rpc('eleve_verify_password', {
+        p_eleve_id: eleveId, p_password: password,
+      });
+      if (error || !data) {
+        setAuthError('Mot de passe incorrect.');
+        return false;
+      }
+      return true;
+    } catch (e: any) {
+      setAuthError(e?.message || 'Erreur réseau. Réessaie.');
+      return false;
+    } finally { setAuthLoading(false); }
+  }, []);
+
+  const finalizeStudentSession = useCallback((info: {
+    eleveId: string; classId: string; className: string; classCode: string; prenom: string; nom: string;
+  }) => {
+    setSession({
+      role: 'eleve', prenom: info.prenom, nom: info.nom.toUpperCase(),
+      classe: info.className, classCode: info.classCode, classId: info.classId, eleveId: info.eleveId,
+    });
   }, []);
 
   const logout = useCallback(() => {
@@ -263,7 +327,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     ready, session, consentAccepted, acceptConsent, a11y, toggleA11y,
     onboardSeen, markOnboardSeen, collection, progress, addOrUpdateFiche,
     recordProgress, masteredCount, toReviewCount, authLoading, authError,
-    setAuthError, teacherSignup, teacherLogin, studentJoin, logout,
+    setAuthError, teacherSignup, teacherLogin, studentJoin,
+    studentSetPassword, studentVerifyPassword, finalizeStudentSession, logout,
   };
 
   return <AppCtx.Provider value={value}>{children}</AppCtx.Provider>;

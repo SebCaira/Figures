@@ -10,7 +10,7 @@ import { Card, Chip, PrimaryButton, SectionTitle, TextField } from '../../src/co
 
 export default function Classe() {
   const { session } = useSession();
-  const { classes, customQuizzes, assignments, createClass, joinAsCoTeacher, removeStudent, deleteClass, assignQuiz } = useData();
+  const { classes, customQuizzes, assignments, createClass, joinAsCoTeacher, removeStudent, deleteClass, assignQuiz, generateResetCode } = useData();
   const { flashToast } = useToast();
   const router = useRouter();
 
@@ -38,6 +38,16 @@ export default function Classe() {
   const copyCode = async (code: string) => {
     await Clipboard.setStringAsync(code);
     flashToast('Code copié ✓');
+  };
+
+  const resetPassword = async (eleveId: string, studentName: string) => {
+    const code = await generateResetCode(eleveId);
+    if (!code) { flashToast('Impossible de générer le code. Réessaie.'); return; }
+    await Clipboard.setStringAsync(code);
+    Alert.alert(
+      'Code de réinitialisation',
+      `Donne ce code à ${studentName} (copié dans le presse-papiers) :\n\n${code}\n\nValable 24h, à usage unique — il lui permettra de créer un nouveau mot de passe.`
+    );
   };
 
   const confirmDelete = (classId: string) => {
@@ -113,13 +123,18 @@ export default function Classe() {
                   {c.students.length === 0 && <Text style={styles.emptyStudents}>Aucun élève n'a encore rejoint.</Text>}
                   {c.students.map((s) => (
                     <View key={s.id} style={styles.studentRow}>
-                      <Text style={styles.studentName}>{s.name}</Text>
-                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                        <Text style={styles.studentPct}>{s.fiches} fiches · {s.pct}</Text>
-                        <Pressable onPress={() => removeStudent(c.id, s.id)}>
-                          <Text style={styles.remove}>×</Text>
-                        </Pressable>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Text style={styles.studentName}>{s.name}</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                          <Text style={styles.studentPct}>{s.fiches} fiches · {s.pct}</Text>
+                          <Pressable onPress={() => removeStudent(c.id, s.id)}>
+                            <Text style={styles.remove}>×</Text>
+                          </Pressable>
+                        </View>
                       </View>
+                      <Text style={styles.resetLink} onPress={() => resetPassword(s.id, s.name)}>
+                        Réinitialiser le mot de passe
+                      </Text>
                     </View>
                   ))}
 
@@ -153,8 +168,9 @@ const styles = StyleSheet.create({
   assignRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 8 },
   assignName: { fontFamily: fonts.sans, fontSize: 13, color: colors.navy },
   emptyStudents: { fontFamily: fonts.sans, fontSize: 12, color: colors.muted },
-  studentRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: colors.dividerLight },
+  studentRow: { paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: colors.dividerLight },
   studentName: { fontFamily: fonts.sans, fontSize: 13, color: colors.navy },
   studentPct: { fontFamily: fonts.sans, fontSize: 12, color: colors.muted },
   remove: { fontSize: 18, color: colors.red, paddingHorizontal: 4 },
+  resetLink: { fontFamily: fonts.sansBold, fontSize: 11, color: colors.gold, marginTop: 4 },
 });

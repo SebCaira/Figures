@@ -33,6 +33,7 @@ type Ctx = {
   publishQuiz: (draft: QuizDef, editingCode?: string) => Promise<QuizDef | null>;
   assignments: Assignment[];
   assignQuiz: (classId: string, quizCode: string) => void;
+  generateResetCode: (eleveId: string) => Promise<string | null>;
 };
 
 const DataCtx = createContext<Ctx | null>(null);
@@ -201,10 +202,17 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const generateResetCode = useCallback(async (eleveId: string) => {
+    if (!session || session.role !== 'prof') return null;
+    const { data, error } = await supabase.rpc('eleve_generate_reset_code', { p_eleve_id: eleveId });
+    if (error || !data) return null;
+    return data as string;
+  }, [session]);
+
   const value: Ctx = {
     classes, loadingClasses, refreshProfData, createClass, joinAsCoTeacher,
     removeStudent, deleteClass, customQuizzes, loadingQuizzes, refreshClassQuizzes,
-    allQuizzes, publishQuiz, assignments, assignQuiz,
+    allQuizzes, publishQuiz, assignments, assignQuiz, generateResetCode,
   };
 
   return <DataCtx.Provider value={value}>{children}</DataCtx.Provider>;
