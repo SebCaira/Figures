@@ -42,8 +42,6 @@ export default function Landing() {
           </View>
         </Pressable>
       </View>
-
-      <Text style={styles.footer}>Version 33 · sept. 2026 · co-prof + fix suivi</Text>
     </View>
   );
 }
@@ -65,5 +63,4 @@ const styles = StyleSheet.create({
   roleSubDark: { fontFamily: fonts.sans, fontSize: 12, color: 'rgba(246,242,233,0.7)', marginTop: 3 },
   roleTitleLight: { fontFamily: fonts.serifSemiBold, fontSize: 17, color: colors.navy },
   roleSubLight: { fontFamily: fonts.sans, fontSize: 12, color: colors.muted, marginTop: 3 },
-  footer: { textAlign: 'center', fontFamily: fonts.sans, fontSize: 11, color: colors.placeholder },
 });
