@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { supabase } from './supabase';
 import { useSession } from './session';
-import { loadJSON, saveJSON } from './storage';
 import { QUIZZES, SHARED_QUIZ, QuizDef, Question } from './seed';
 
 export type RosterStudent = { id: string; name: string; fiches: number; pct: string };
@@ -15,8 +14,6 @@ export type ClassGroup = {
 };
 
 export type Assignment = { id: string; classId: string; quizCode: string; due: string };
-
-const K_ASSIGNMENTS = 'figures.assignments.v1';
 
 type Ctx = {
   classes: ClassGroup[];
@@ -32,7 +29,7 @@ type Ctx = {
   allQuizzes: Record<string, QuizDef>;
   publishQuiz: (draft: QuizDef, editingCode?: string) => Promise<QuizDef | null>;
   assignments: Assignment[];
-  assignQuiz: (classId: string, quizCode: string) => void;
+  assignQuiz: (classId: string, quizCode: string) => Promise<void>;
   generateResetCode: (eleveId: string) => Promise<string | null>;
 };
 
@@ -64,10 +61,11 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [loadingQuizzes, setLoadingQuizzes] = useState(false);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
 
-  useEffect(() => {
-    loadJSON<Assignment[]>(K_ASSIGNMENTS, []).then(setAssignments);
+  const fetchAssignments = useCallback(async (classIds: string[]) => {
+    if (!classIds.length) { setAssignments([]); return; }
+    const { data } = await supabase.from('assignments').select('id, class_id, quiz_code, due').in('class_id', classIds);
+    setAssignments((data || []).map((a: any) => ({ id: a.id, classId: a.class_id, quizCode: a.quiz_code, due: a.due })));
   }, []);
-  useEffect(() => { saveJSON(K_ASSIGNMENTS, assignments); }, [assignments]);
 
   const refreshProfData = useCallback(async () => {
     if (!session || session.role !== 'prof') return;
@@ -110,10 +108,11 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       const merged: Record<string, QuizDef> = {};
       (personnages || []).forEach((row: any) => { merged[row.code] = row.data; });
       setCustomQuizzes(merged);
+      await fetchAssignments(result.map((c) => c.id));
     } finally {
       setLoadingClasses(false);
     }
-  }, [session]);
+  }, [session, fetchAssignments]);
 
   const refreshClassQuizzes = useCallback(async () => {
     if (!session || session.role !== 'eleve') return;
@@ -129,10 +128,11 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       const merged: Record<string, QuizDef> = {};
       (personnages || []).forEach((row: any) => { merged[row.code] = row.data; });
       setCustomQuizzes(merged);
+      await fetchAssignments([session.classId]);
     } finally {
       setLoadingQuizzes(false);
     }
-  }, [session]);
+  }, [session, fetchAssignments]);
 
   useEffect(() => {
     if (!session) { setClasses([]); setCustomQuizzes({}); return; }
@@ -172,6 +172,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const deleteClass = useCallback((classId: string) => {
     setClasses((s) => s.filter((c) => c.id !== classId));
     setAssignments((s) => s.filter((a) => a.classId !== classId));
+    supabase.from('assignments').delete().eq('class_id', classId).then(() => {});
   }, []);
 
   const allQuizzes = useMemo<Record<string, QuizDef>>(() => ({
@@ -194,13 +195,22 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     return full;
   }, [session]);
 
-  const assignQuiz = useCallback((classId: string, quizCode: string) => {
-    setAssignments((s) => {
-      const exists = s.find((a) => a.classId === classId && a.quizCode === quizCode);
-      if (exists) return s.filter((a) => a !== exists);
-      return [...s, { id: `a${Date.now()}`, classId, quizCode, due: 'vendredi prochain' }];
-    });
-  }, []);
+  const assignQuiz = useCallback(async (classId: string, quizCode: string) => {
+    const exists = assignments.find((a) => a.classId === classId && a.quizCode === quizCode);
+    if (exists) {
+      await supabase.from('assignments').delete().eq('id', exists.id);
+      setAssignments((s) => s.filter((a) => a.id !== exists.id));
+    } else {
+      const { data, error } = await supabase
+        .from('assignments')
+        .insert({ class_id: classId, quiz_code: quizCode, due: 'vendredi prochain' })
+        .select('id, class_id, quiz_code, due')
+        .single();
+      if (!error && data) {
+        setAssignments((s) => [...s, { id: data.id, classId: data.class_id, quizCode: data.quiz_code, due: data.due }]);
+      }
+    }
+  }, [assignments]);
 
   const generateResetCode = useCallback(async (eleveId: string) => {
     if (!session || session.role !== 'prof') return null;

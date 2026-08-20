@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { colors, fonts, radii } from '../../src/theme/theme';
+import { colors, fonts, radii, subjectMeta } from '../../src/theme/theme';
 import { useSession } from '../../src/lib/session';
 import { useData } from '../../src/lib/data';
 import { useQuizRun } from '../../src/lib/quizRun';
@@ -12,7 +12,7 @@ import { Card, Chip, PrimaryButton, SectionTitle, TextField } from '../../src/co
 
 export default function Quizz() {
   const { session, collection, progress } = useSession();
-  const { allQuizzes } = useData();
+  const { allQuizzes, assignments } = useData();
   const { startQuiz } = useQuizRun();
   const { flashToast } = useToast();
   const router = useRouter();
@@ -33,6 +33,14 @@ export default function Quizz() {
   };
 
   const subjects = Array.from(new Set(collection.map((f) => f.subject)));
+
+  const myAssignments = useMemo(() => {
+    if (session?.role !== 'eleve') return [];
+    return assignments
+      .filter((a) => a.classId === session.classId)
+      .map((a) => ({ ...a, quiz: allQuizzes[a.quizCode] }))
+      .filter((a) => !!a.quiz);
+  }, [assignments, allQuizzes, session]);
 
   const startRevision = (filter: string) => {
     router.push({ pathname: '/quiz', params: { revision: '1', filter } });
@@ -60,6 +68,34 @@ export default function Quizz() {
           ))}
         </View>
       </Card>
+
+      {myAssignments.length > 0 && (
+        <View style={{ marginTop: 26 }}>
+          <SectionTitle>À faire</SectionTitle>
+          {myAssignments.map((a) => {
+            const meta = subjectMeta(a.quiz!.subject);
+            const done = collection.some((f) => f.id === a.quizCode.toLowerCase());
+            return (
+              <Pressable
+                key={a.id}
+                onPress={() => { startQuiz(a.quiz!, 'character'); router.push('/quiz'); }}
+                style={styles.assignRow}
+              >
+                <View style={[styles.assignDot, { backgroundColor: meta.color }]} />
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.assignName}>{a.quiz!.name}</Text>
+                  <Text style={styles.assignDue}>À faire pour {a.due}</Text>
+                </View>
+                <View style={[styles.assignBadge, { backgroundColor: done ? colors.greenSoft : colors.amberSoft }]}>
+                  <Text style={{ color: done ? colors.greenDark : colors.amber, fontFamily: fonts.sansBold, fontSize: 11 }}>
+                    {done ? 'Fait ✓' : 'À faire'}
+                  </Text>
+                </View>
+              </Pressable>
+            );
+          })}
+        </View>
+      )}
 
       <View style={{ marginTop: 26 }}>
         <SectionTitle>Réviser mes fiches</SectionTitle>
@@ -106,6 +142,14 @@ export default function Quizz() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.cream },
+  assignRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: colors.cardWhite,
+    borderWidth: 1, borderColor: colors.border, borderRadius: radii.md, padding: 12, marginBottom: 8,
+  },
+  assignDot: { width: 8, height: 8, borderRadius: 4 },
+  assignName: { fontFamily: fonts.serifSemiBold, fontSize: 14, color: colors.navy },
+  assignDue: { fontFamily: fonts.sans, fontSize: 11, color: colors.muted, marginTop: 1 },
+  assignBadge: { borderRadius: radii.pill, paddingVertical: 4, paddingHorizontal: 8 },
   greeting: { fontFamily: fonts.serifSemiBold, fontSize: 26, color: colors.navy },
   cardTitleDark: { fontFamily: fonts.serifSemiBold, fontSize: 17, color: colors.cream },
   badgeRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
