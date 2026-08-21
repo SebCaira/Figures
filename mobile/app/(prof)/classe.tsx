@@ -7,6 +7,7 @@ import { colors, fonts, radii } from '../../src/theme/theme';
 import { useSession } from '../../src/lib/session';
 import { useData } from '../../src/lib/data';
 import { useToast } from '../../src/lib/toast';
+import { famName } from '../../src/lib/text';
 import { Card, Chip, PrimaryButton, SectionTitle, TextField } from '../../src/components/ui';
 
 export default function Classe() {
@@ -153,7 +154,7 @@ export default function Classe() {
                         const assigned = classAssignments.some((a) => a.quizCode === q.code);
                         return (
                           <View key={q.code} style={styles.assignRow}>
-                            <Text style={styles.assignName}>{q.name}</Text>
+                            <Text style={styles.assignName}>{famName(q.name)}</Text>
                             <Chip label={assigned ? 'Assigné ✓' : 'Assigner'} active={assigned} onPress={() => assignQuiz(c.id, q.code)} />
                           </View>
                         );

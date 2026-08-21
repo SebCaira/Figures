@@ -10,6 +10,7 @@ import { useQuizRun } from '../../src/lib/quizRun';
 import { useToast } from '../../src/lib/toast';
 import { computeBadges } from '../../src/lib/badges';
 import { DEMO_CODES } from '../../src/lib/seed';
+import { famName } from '../../src/lib/text';
 import { Card, Chip, PrimaryButton, SectionTitle, TextField } from '../../src/components/ui';
 
 export default function Quizz() {
@@ -90,7 +91,7 @@ export default function Quizz() {
               >
                 <View style={[styles.assignDot, { backgroundColor: meta.color }]} />
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.assignName}>{a.quiz!.name}</Text>
+                  <Text style={styles.assignName}>{famName(a.quiz!.name)}</Text>
                   <Text style={styles.assignDue}>À faire pour {a.due}</Text>
                 </View>
                 <View style={[styles.assignBadge, { backgroundColor: done ? colors.greenSoft : colors.amberSoft }]}>

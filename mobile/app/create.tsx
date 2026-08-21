@@ -16,7 +16,7 @@ const LANGUES = ['Français', 'Anglais', 'Allemand', 'Espagnol'];
 export default function Create() {
   const { edit } = useLocalSearchParams<{ edit?: string }>();
   const { session } = useSession();
-  const { classes, customQuizzes, publishQuiz } = useData();
+  const { classes, customQuizzes, publishQuiz, assignQuiz, assignments } = useData();
   const { flashToast } = useToast();
   const router = useRouter();
 
@@ -68,6 +68,10 @@ export default function Create() {
       questions, by: session.prenom, niveau, langue, classId, photo,
     };
     const result = await publishQuiz(draft, editing?.code);
+    if (result && classId) {
+      const alreadyAssigned = assignments.some((a) => a.classId === classId && a.quizCode === result.code);
+      if (!alreadyAssigned) await assignQuiz(classId, result.code);
+    }
     setPublishing(false);
     if (result) {
       flashToast(editing ? 'Fiche modifiée ✓' : `Publié · code ${result.code}`);
