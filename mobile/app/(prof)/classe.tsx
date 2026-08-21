@@ -66,6 +66,17 @@ export default function Classe() {
     );
   };
 
+  const confirmRemoveStudent = (classId: string, studentId: string, studentName: string) => {
+    Alert.alert(
+      'Retirer cet élève',
+      `${studentName} et toute sa progression seront définitivement supprimés. Cette action est irréversible.`,
+      [
+        { text: 'Annuler', style: 'cancel' },
+        { text: 'Retirer', style: 'destructive', onPress: () => removeStudent(classId, studentId) },
+      ]
+    );
+  };
+
   const confirmArchive = (classId: string) => {
     Alert.alert(
       'Clore la classe',
@@ -166,7 +177,7 @@ export default function Classe() {
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                           <Text style={styles.studentPct}>{s.fiches} fiches · {s.pct}</Text>
                           <Pressable
-                            onPress={() => removeStudent(c.id, s.id)}
+                            onPress={() => confirmRemoveStudent(c.id, s.id, s.name)}
                             accessibilityRole="button"
                             accessibilityLabel={`Retirer ${s.name} de la classe`}
                           >
