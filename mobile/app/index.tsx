@@ -27,14 +27,24 @@ export default function Landing() {
       </View>
 
       <View style={styles.actions}>
-        <Pressable style={[styles.roleBtn, styles.roleBtnDark]} onPress={() => router.push('/auth?role=eleve')}>
+        <Pressable
+          style={[styles.roleBtn, styles.roleBtnDark]}
+          onPress={() => router.push('/auth?role=eleve')}
+          accessibilityRole="button"
+          accessibilityLabel="Espace élève, je réponds aux quiz et je collectionne mes fiches"
+        >
           <Text style={styles.roleIcon}>✸</Text>
           <View style={{ flex: 1 }}>
             <Text style={styles.roleTitleDark}>Espace élève</Text>
             <Text style={styles.roleSubDark}>Je réponds aux quiz et je collectionne mes fiches</Text>
           </View>
         </Pressable>
-        <Pressable style={[styles.roleBtn, styles.roleBtnLight]} onPress={() => router.push('/auth?role=prof')}>
+        <Pressable
+          style={[styles.roleBtn, styles.roleBtnLight]}
+          onPress={() => router.push('/auth?role=prof')}
+          accessibilityRole="button"
+          accessibilityLabel="Espace professeur, je crée les personnages et je partage les codes"
+        >
           <Text style={[styles.roleIcon, { color: colors.navy }]}>✎</Text>
           <View style={{ flex: 1 }}>
             <Text style={styles.roleTitleLight}>Espace professeur</Text>

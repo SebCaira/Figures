@@ -41,7 +41,13 @@ export default function ProfFiches() {
         {groups.map(([subject, count]) => {
           const meta = subjectMeta(subject);
           return (
-            <Pressable key={subject} style={styles.groupCard} onPress={() => router.push(`/subject/${encodeURIComponent(subject)}`)}>
+            <Pressable
+              key={subject}
+              style={styles.groupCard}
+              onPress={() => router.push(`/subject/${encodeURIComponent(subject)}`)}
+              accessibilityRole="button"
+              accessibilityLabel={`${subject}, ${count} personnage${count > 1 ? 's' : ''}`}
+            >
               <View style={[styles.countBadge, { backgroundColor: meta.soft }]}>
                 <Text style={[styles.countText, { color: meta.color }]}>{count}</Text>
               </View>

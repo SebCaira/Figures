@@ -24,14 +24,20 @@ export function FicheAvatar({ fiche, size = 56 }: { fiche: Fiche; size?: number 
 export function FicheCard({ fiche, progress, onPress }: { fiche: Fiche; progress?: ProgressEntry; onPress: () => void }) {
   const meta = subjectMeta(fiche.subject);
   const mastered = !!progress?.mastered;
+  const statusLabel = mastered ? 'Maîtrisée' : progress ? `À revoir · ${Math.round((progress.best / progress.total) * 100)}%` : 'À revoir';
   return (
-    <Pressable onPress={onPress} style={styles.card}>
+    <Pressable
+      onPress={onPress}
+      style={styles.card}
+      accessibilityRole="button"
+      accessibilityLabel={`${famName(fiche.name)}${fiche.years ? ', ' + fiche.years : ''}, ${statusLabel}`}
+    >
       <FicheAvatar fiche={fiche} size={64} />
       <Text style={styles.name} numberOfLines={1}>{famName(fiche.name)}</Text>
       {!!fiche.years && <Text style={styles.years} numberOfLines={1}>{fiche.years}</Text>}
       <View style={[styles.badge, { backgroundColor: mastered ? colors.greenSoft : colors.amberSoft }]}>
         <Text style={[styles.badgeText, { color: mastered ? colors.greenDark : colors.amber }]}>
-          {mastered ? 'Maîtrisée' : progress ? `À revoir · ${Math.round((progress.best / progress.total) * 100)}%` : 'À revoir'}
+          {statusLabel}
         </Text>
       </View>
     </Pressable>

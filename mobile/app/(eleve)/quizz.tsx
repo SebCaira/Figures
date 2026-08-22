@@ -88,6 +88,8 @@ export default function Quizz() {
                 key={a.id}
                 onPress={() => { startQuiz(a.quiz!, 'character'); router.push('/quiz'); }}
                 style={styles.assignRow}
+                accessibilityRole="button"
+                accessibilityLabel={`${famName(a.quiz!.name)}, à faire pour ${a.due}, ${done ? 'fait' : 'à faire'}`}
               >
                 <View style={[styles.assignDot, { backgroundColor: meta.color }]} />
                 <View style={{ flex: 1 }}>

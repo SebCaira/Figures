@@ -51,7 +51,11 @@ export default function Quiz() {
   return (
     <View style={styles.screen}>
       <View style={styles.topBar}>
-        <Pressable onPress={() => { reset(); router.replace(run.mode === 'character' ? '/(eleve)/quizz' : '/(eleve)/fiches'); }}>
+        <Pressable
+          onPress={() => { reset(); router.replace(run.mode === 'character' ? '/(eleve)/quizz' : '/(eleve)/fiches'); }}
+          accessibilityRole="button"
+          accessibilityLabel="Quitter le quiz"
+        >
           <Text style={styles.quit}>✕</Text>
         </Pressable>
         <Text style={styles.counter}>{run.index + 1}/{total}</Text>
@@ -86,6 +90,9 @@ export default function Quiz() {
               disabled={isAnswered}
               onPress={() => selectAnswer(i)}
               style={[styles.option, { backgroundColor: bg, borderColor: border }]}
+              accessibilityRole="button"
+              accessibilityLabel={`Réponse ${String.fromCharCode(65 + i)}, ${opt}`}
+              accessibilityState={{ disabled: isAnswered, selected: isPicked }}
             >
               <Text style={[styles.optionLetter, { color: textColor }]}>{String.fromCharCode(65 + i)}</Text>
               <Text style={[styles.optionText, { color: textColor }]}>{opt}</Text>
