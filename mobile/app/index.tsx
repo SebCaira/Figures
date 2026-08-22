@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../src/components/AppText';
 import { Redirect, useRouter } from 'expo-router';
 import { colors, fonts, radii } from '../src/theme/theme';
@@ -52,6 +52,22 @@ export default function Landing() {
           </View>
         </Pressable>
       </View>
+
+      {Platform.OS === 'web' && (
+        // react-native-web renders a real <a href> here since accessibilityRole="link" + href
+        // are both set — `href` isn't in RN's TextProps typings, hence the ts-expect-error below.
+        <View style={styles.webLinks}>
+          {/* @ts-expect-error web-only href, see comment above */}
+          <Text accessibilityRole="link" href="https://figurescollege.netlify.app/marketing.html" style={styles.webLink}>
+            En savoir plus
+          </Text>
+          <Text style={styles.webLinkSep}>·</Text>
+          {/* @ts-expect-error web-only href, see comment above */}
+          <Text accessibilityRole="link" href="https://figurescollege.netlify.app/etablissements.html" style={styles.webLink}>
+            Vous êtes établissement ?
+          </Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -73,4 +89,7 @@ const styles = StyleSheet.create({
   roleSubDark: { fontFamily: fonts.sans, fontSize: 12, color: 'rgba(246,242,233,0.7)', marginTop: 3 },
   roleTitleLight: { fontFamily: fonts.serifSemiBold, fontSize: 17, color: colors.navy },
   roleSubLight: { fontFamily: fonts.sans, fontSize: 12, color: colors.muted, marginTop: 3 },
+  webLinks: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 8, marginTop: 18 },
+  webLink: { fontFamily: fonts.sansBold, fontSize: 12, color: colors.muted },
+  webLinkSep: { fontFamily: fonts.sans, fontSize: 12, color: colors.border },
 });
