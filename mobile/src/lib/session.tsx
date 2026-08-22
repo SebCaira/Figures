@@ -17,6 +17,7 @@ export type ProfSession = {
   email: string;
   prenom: string;
   uid: string;
+  licenceExpiration: string | null;
 };
 
 export type AppSession = EleveSession | ProfSession | null;
@@ -75,6 +76,7 @@ type Ctx = {
   setAuthError: (s: string) => void;
   teacherSignup: (name: string, email: string, password: string) => Promise<boolean>;
   teacherLogin: (email: string, password: string) => Promise<boolean>;
+  activateLicence: (code: string) => Promise<{ ok: boolean; message: string }>;
   studentJoin: (code: string, prenom: string, nom: string) => Promise<StudentJoinResult | null>;
   studentSetPassword: (eleveId: string, password: string, resetCode?: string) => Promise<boolean>;
   studentVerifyPassword: (eleveId: string, password: string) => Promise<boolean>;
@@ -211,7 +213,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       }
       if (!uid) { setAuthError('Erreur inattendue. Réessaie.'); return false; }
       await supabase.from('profs').upsert({ id: uid, prenom: name.trim() });
-      setSession({ role: 'prof', email: email.trim(), prenom: name.trim(), uid });
+      setSession({ role: 'prof', email: email.trim(), prenom: name.trim(), uid, licenceExpiration: null });
       return true;
     } catch (e: any) {
       setAuthError(e?.message || 'Erreur réseau. Réessaie.');
@@ -226,13 +228,33 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       if (error) { setAuthError(frError(error.message)); return false; }
       const uid = data.user?.id;
       if (!uid) { setAuthError('Erreur inattendue. Réessaie.'); return false; }
-      const { data: profRow } = await supabase.from('profs').select('prenom').eq('id', uid).maybeSingle();
-      setSession({ role: 'prof', email: email.trim(), prenom: profRow?.prenom || 'Professeur', uid });
+      const { data: profRow } = await supabase.from('profs').select('prenom, licence_expiration').eq('id', uid).maybeSingle();
+      setSession({
+        role: 'prof', email: email.trim(), prenom: profRow?.prenom || 'Professeur', uid,
+        licenceExpiration: profRow?.licence_expiration ?? null,
+      });
       return true;
     } catch (e: any) {
       setAuthError(e?.message || 'Erreur réseau. Réessaie.');
       return false;
     } finally { setAuthLoading(false); }
+  }, []);
+
+  const activateLicence = useCallback(async (code: string) => {
+    const { data, error } = await supabase.rpc('activer_licence', { p_code: code.trim() });
+    if (error || !data?.length) {
+      const m = error?.message || '';
+      let message = "Impossible d'activer ce code. Réessaie.";
+      if (m.includes('LICENCE_NOT_FOUND')) message = "Ce code n'existe pas. Vérifie auprès de ton établissement.";
+      else if (m.includes('LICENCE_EXPIRED')) message = 'Ce code a expiré.';
+      else if (m.includes('LICENCE_REVOKED')) message = "Ce code n'est plus actif.";
+      else if (m.includes('LICENCE_ALREADY_ACTIVATED')) message = 'Ce code est déjà activé sur ton compte.';
+      else if (m.includes('LICENCE_QUOTA_REACHED')) message = "Le nombre maximum d'enseignants pour cet établissement est atteint.";
+      return { ok: false, message };
+    }
+    const dateExpiration = data[0].date_expiration as string;
+    setSession((s) => (s && s.role === 'prof' ? { ...s, licenceExpiration: dateExpiration } : s));
+    return { ok: true, message: `Licence active jusqu'au ${new Date(dateExpiration).toLocaleDateString('fr-FR')}` };
   }, []);
 
   const studentJoin = useCallback(async (code: string, prenom: string, nom: string) => {
@@ -329,7 +351,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     ready, session, consentAccepted, acceptConsent, a11y, toggleA11y,
     onboardSeen, markOnboardSeen, collection, progress, addOrUpdateFiche,
     recordProgress, masteredCount, toReviewCount, authLoading, authError,
-    setAuthError, teacherSignup, teacherLogin, studentJoin,
+    setAuthError, teacherSignup, teacherLogin, activateLicence, studentJoin,
     studentSetPassword, studentVerifyPassword, finalizeStudentSession, logout,
   };
 

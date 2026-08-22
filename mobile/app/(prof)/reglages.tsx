@@ -1,16 +1,21 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { Text } from '../../src/components/AppText';
 import { useRouter } from 'expo-router';
 import { colors, fonts } from '../../src/theme/theme';
 import { useSession } from '../../src/lib/session';
 import { useData } from '../../src/lib/data';
-import { Card, Chip, PrimaryButton } from '../../src/components/ui';
+import { useToast } from '../../src/lib/toast';
+import { Card, Chip, PrimaryButton, TextField } from '../../src/components/ui';
 
 export default function Reglages() {
-  const { session, a11y, toggleA11y, logout } = useSession();
+  const { session, a11y, toggleA11y, logout, activateLicence } = useSession();
   const { classes, customQuizzes } = useData();
+  const { flashToast } = useToast();
   const router = useRouter();
+
+  const [licenceCode, setLicenceCode] = useState('');
+  const [activating, setActivating] = useState(false);
 
   const subjects = useMemo(
     () => Array.from(new Set(Object.values(customQuizzes).map((q) => q.subject))),
@@ -19,12 +24,49 @@ export default function Reglages() {
 
   if (session?.role !== 'prof') return null;
 
+  const licenceActive = !!session.licenceExpiration && new Date(session.licenceExpiration) >= new Date();
+
+  const activate = async () => {
+    if (!licenceCode.trim()) return;
+    setActivating(true);
+    const result = await activateLicence(licenceCode.trim());
+    setActivating(false);
+    flashToast(result.message);
+    if (result.ok) setLicenceCode('');
+  };
+
   return (
     <ScrollView style={styles.screen} contentContainerStyle={{ padding: 20, paddingTop: 56, paddingBottom: 40 }}>
       <View style={styles.header}>
         <View style={styles.avatar}><Text style={styles.avatarText}>{session.prenom[0]?.toUpperCase()}</Text></View>
         <Text style={styles.name}>{session.prenom}</Text>
         <Text style={styles.meta}>{Object.keys(customQuizzes).length} personnage{Object.keys(customQuizzes).length > 1 ? 's' : ''} · {classes.length} classe{classes.length > 1 ? 's' : ''}</Text>
+      </View>
+
+      <View style={{ marginTop: 20 }}>
+        <Text style={styles.sectionLabel}>Licence établissement</Text>
+        <Card>
+          {licenceActive ? (
+            <Text style={styles.rowLabel}>
+              Licence active jusqu'au {new Date(session.licenceExpiration!).toLocaleDateString('fr-FR')}
+            </Text>
+          ) : (
+            <>
+              <TextField
+                value={licenceCode}
+                onChangeText={setLicenceCode}
+                placeholder="Ex. INST-XXXX-2026"
+                autoCapitalize="characters"
+              />
+              <PrimaryButton
+                label="Activer"
+                onPress={activate}
+                loading={activating}
+                style={{ marginTop: 10 }}
+              />
+            </>
+          )}
+        </Card>
       </View>
 
       {subjects.length > 0 && (
