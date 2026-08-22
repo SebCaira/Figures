@@ -64,7 +64,7 @@ export default function Landing() {
           <Text style={styles.webLinkSep}>·</Text>
           {/* @ts-expect-error web-only href, see comment above */}
           <Text accessibilityRole="link" href="https://figurescollege.netlify.app/etablissements.html" style={styles.webLink}>
-            Vous êtes établissement ?
+            Vous êtes un établissement ?
           </Text>
         </View>
       )}
