@@ -22,6 +22,13 @@ export type ProfSession = {
 
 export type AppSession = EleveSession | ProfSession | null;
 
+export function isLicenceActive(session: AppSession): boolean {
+  return (
+    !!session && session.role === 'prof' &&
+    !!session.licenceExpiration && new Date(session.licenceExpiration) >= new Date()
+  );
+}
+
 export type Fiche = {
   id: string;
   code: string;

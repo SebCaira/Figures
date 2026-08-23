@@ -3,7 +3,7 @@ import { Image, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from '../src/components/AppText';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { colors, fonts, radii, subjectMeta, SUBJECTS } from '../src/theme/theme';
-import { useSession } from '../src/lib/session';
+import { isLicenceActive, useSession } from '../src/lib/session';
 import { useData } from '../src/lib/data';
 import { useToast } from '../src/lib/toast';
 import { generateCharacter } from '../src/lib/ai';
@@ -39,6 +39,21 @@ export default function Create() {
   const [publishing, setPublishing] = useState(false);
 
   if (session?.role !== 'prof') return null;
+
+  if (!editing && !isLicenceActive(session)) {
+    return (
+      <ScrollView style={styles.screen} contentContainerStyle={{ padding: 20, paddingTop: 56, paddingBottom: 50 }}>
+        <BackButton onPress={() => router.back()} />
+        <View style={styles.lockedCard}>
+          <Text style={styles.lockedTitle}>Licence établissement requise</Text>
+          <Text style={styles.lockedText}>
+            La création de fiches est réservée aux établissements ayant une licence Figures active. Demande le code de licence à ton établissement, puis active-le dans Réglages.
+          </Text>
+          <PrimaryButton label="Aller dans Réglages" onPress={() => router.push('/(prof)/reglages')} style={{ marginTop: 16 }} />
+        </View>
+      </ScrollView>
+    );
+  }
 
   const generate = async () => {
     if (!name.trim()) { setError('Entre un nom de personnage.'); return; }
@@ -220,6 +235,12 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.cream },
   title: { fontFamily: fonts.serifSemiBold, fontSize: 24, color: colors.navy, marginTop: 8 },
   hintBanner: { backgroundColor: colors.teacherSoft, borderRadius: radii.md, padding: 12, marginTop: 14 },
+  lockedCard: {
+    backgroundColor: colors.cardWhite, borderWidth: 1, borderColor: colors.border,
+    borderRadius: radii.lg, padding: 20, marginTop: 40,
+  },
+  lockedTitle: { fontFamily: fonts.serifSemiBold, fontSize: 19, color: colors.navy },
+  lockedText: { fontFamily: fonts.sans, fontSize: 14, color: colors.muted, marginTop: 8, lineHeight: 20 },
   hintText: { fontFamily: fonts.sans, fontSize: 13, color: colors.navy },
   bold: { fontFamily: fonts.sansBold },
   errorBanner: { backgroundColor: colors.redSoft, borderRadius: radii.md, padding: 12, marginTop: 12 },

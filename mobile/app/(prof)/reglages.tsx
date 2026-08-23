@@ -3,7 +3,7 @@ import { ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { Text } from '../../src/components/AppText';
 import { useRouter } from 'expo-router';
 import { colors, fonts } from '../../src/theme/theme';
-import { useSession } from '../../src/lib/session';
+import { isLicenceActive, useSession } from '../../src/lib/session';
 import { useData } from '../../src/lib/data';
 import { useToast } from '../../src/lib/toast';
 import { Card, Chip, PrimaryButton, TextField } from '../../src/components/ui';
@@ -24,7 +24,7 @@ export default function Reglages() {
 
   if (session?.role !== 'prof') return null;
 
-  const licenceActive = !!session.licenceExpiration && new Date(session.licenceExpiration) >= new Date();
+  const licenceActive = isLicenceActive(session);
 
   const activate = async () => {
     if (!licenceCode.trim()) return;
