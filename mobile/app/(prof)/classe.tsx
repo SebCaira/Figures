@@ -4,11 +4,11 @@ import { Text } from '../../src/components/AppText';
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as Clipboard from 'expo-clipboard';
 import { colors, fonts, radii } from '../../src/theme/theme';
-import { useSession } from '../../src/lib/session';
+import { isLicenceActive, useSession } from '../../src/lib/session';
 import { useData } from '../../src/lib/data';
 import { useToast } from '../../src/lib/toast';
 import { famName } from '../../src/lib/text';
-import { Card, Chip, PrimaryButton, SectionTitle, TextField } from '../../src/components/ui';
+import { Card, Chip, LicenceLockedCard, PrimaryButton, SectionTitle, TextField } from '../../src/components/ui';
 
 export default function Classe() {
   const { session } = useSession();
@@ -25,6 +25,15 @@ export default function Classe() {
   const [expanded, setExpanded] = useState<string | null>(null);
 
   if (session?.role !== 'prof') return null;
+
+  if (!isLicenceActive(session)) {
+    return (
+      <ScrollView style={styles.screen} contentContainerStyle={{ padding: 20, paddingTop: 56, paddingBottom: 40 }}>
+        <Text style={styles.title}>Mes classes</Text>
+        <LicenceLockedCard onActivate={() => router.push('/(prof)/reglages')} />
+      </ScrollView>
+    );
+  }
 
   const doCreate = async () => {
     if (!newName.trim()) return;

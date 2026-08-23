@@ -3,9 +3,9 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from '../../src/components/AppText';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { colors, fonts, radii, subjectMeta } from '../../src/theme/theme';
-import { useSession } from '../../src/lib/session';
+import { isLicenceActive, useSession } from '../../src/lib/session';
 import { useData } from '../../src/lib/data';
-import { PrimaryButton } from '../../src/components/ui';
+import { LicenceLockedCard, PrimaryButton } from '../../src/components/ui';
 
 export default function ProfFiches() {
   const { session } = useSession();
@@ -21,6 +21,15 @@ export default function ProfFiches() {
   }, [customQuizzes]);
 
   if (session?.role !== 'prof') return null;
+
+  if (!isLicenceActive(session)) {
+    return (
+      <ScrollView style={styles.screen} contentContainerStyle={{ padding: 20, paddingTop: 56, paddingBottom: 40 }}>
+        <Text style={styles.greeting}>Bonjour {session.prenom}</Text>
+        <LicenceLockedCard onActivate={() => router.push('/(prof)/reglages')} />
+      </ScrollView>
+    );
+  }
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={{ padding: 20, paddingTop: 56, paddingBottom: 40 }}>

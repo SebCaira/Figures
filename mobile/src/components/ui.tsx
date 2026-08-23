@@ -93,6 +93,18 @@ export function BackButton({ onPress }: { onPress: () => void }) {
   );
 }
 
+export function LicenceLockedCard({ onActivate }: { onActivate: () => void }) {
+  return (
+    <View style={styles.lockedCard}>
+      <Text style={styles.lockedTitle}>Licence établissement requise</Text>
+      <Text style={styles.lockedText}>
+        Cette section est réservée aux établissements ayant une licence Figures active. Demande le code de licence à ton établissement, puis active-le dans Réglages.
+      </Text>
+      <PrimaryButton label="Aller dans Réglages" onPress={onActivate} style={{ marginTop: 16 }} />
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.cream },
   card: {
@@ -118,4 +130,10 @@ const styles = StyleSheet.create({
   sectionTitle: { fontFamily: fonts.sansBold, fontSize: 13, letterSpacing: 0.4, color: colors.muted, textTransform: 'uppercase', marginBottom: 10 },
   backBtn: { paddingVertical: 6, paddingHorizontal: 2, alignSelf: 'flex-start' },
   backBtnText: { fontFamily: fonts.sansBold, fontSize: 15, color: colors.navy },
+  lockedCard: {
+    backgroundColor: colors.cardWhite, borderWidth: 1, borderColor: colors.border,
+    borderRadius: radii.lg, padding: 20, marginTop: 40,
+  },
+  lockedTitle: { fontFamily: fonts.serifSemiBold, fontSize: 19, color: colors.navy },
+  lockedText: { fontFamily: fonts.sans, fontSize: 14, color: colors.muted, marginTop: 8, lineHeight: 20 },
 });

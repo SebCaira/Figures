@@ -8,7 +8,7 @@ import { useData } from '../src/lib/data';
 import { useToast } from '../src/lib/toast';
 import { generateCharacter } from '../src/lib/ai';
 import { Question, QuizDef } from '../src/lib/seed';
-import { BackButton, Card, Chip, PrimaryButton, SectionTitle, TextField } from '../src/components/ui';
+import { BackButton, Card, Chip, LicenceLockedCard, PrimaryButton, SectionTitle, TextField } from '../src/components/ui';
 
 const NIVEAUX = ['6e', '5e', '4e', '3e'];
 const LANGUES = ['Français', 'Anglais', 'Allemand', 'Espagnol'];
@@ -40,17 +40,11 @@ export default function Create() {
 
   if (session?.role !== 'prof') return null;
 
-  if (!editing && !isLicenceActive(session)) {
+  if (!isLicenceActive(session)) {
     return (
       <ScrollView style={styles.screen} contentContainerStyle={{ padding: 20, paddingTop: 56, paddingBottom: 50 }}>
         <BackButton onPress={() => router.back()} />
-        <View style={styles.lockedCard}>
-          <Text style={styles.lockedTitle}>Licence établissement requise</Text>
-          <Text style={styles.lockedText}>
-            La création de fiches est réservée aux établissements ayant une licence Figures active. Demande le code de licence à ton établissement, puis active-le dans Réglages.
-          </Text>
-          <PrimaryButton label="Aller dans Réglages" onPress={() => router.push('/(prof)/reglages')} style={{ marginTop: 16 }} />
-        </View>
+        <LicenceLockedCard onActivate={() => router.push('/(prof)/reglages')} />
       </ScrollView>
     );
   }
@@ -235,12 +229,6 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.cream },
   title: { fontFamily: fonts.serifSemiBold, fontSize: 24, color: colors.navy, marginTop: 8 },
   hintBanner: { backgroundColor: colors.teacherSoft, borderRadius: radii.md, padding: 12, marginTop: 14 },
-  lockedCard: {
-    backgroundColor: colors.cardWhite, borderWidth: 1, borderColor: colors.border,
-    borderRadius: radii.lg, padding: 20, marginTop: 40,
-  },
-  lockedTitle: { fontFamily: fonts.serifSemiBold, fontSize: 19, color: colors.navy },
-  lockedText: { fontFamily: fonts.sans, fontSize: 14, color: colors.muted, marginTop: 8, lineHeight: 20 },
   hintText: { fontFamily: fonts.sans, fontSize: 13, color: colors.navy },
   bold: { fontFamily: fonts.sansBold },
   errorBanner: { backgroundColor: colors.redSoft, borderRadius: radii.md, padding: 12, marginTop: 12 },
