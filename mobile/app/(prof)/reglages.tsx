@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { Text } from '../../src/components/AppText';
 import { useRouter } from 'expo-router';
 import { colors, fonts } from '../../src/theme/theme';
@@ -9,13 +9,14 @@ import { useToast } from '../../src/lib/toast';
 import { Card, Chip, PrimaryButton, TextField } from '../../src/components/ui';
 
 export default function Reglages() {
-  const { session, a11y, toggleA11y, logout, activateLicence } = useSession();
+  const { session, a11y, toggleA11y, logout, activateLicence, deleteAccount } = useSession();
   const { classes, customQuizzes } = useData();
   const { flashToast } = useToast();
   const router = useRouter();
 
   const [licenceCode, setLicenceCode] = useState('');
   const [activating, setActivating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const subjects = useMemo(
     () => Array.from(new Set(Object.values(customQuizzes).map((q) => q.subject))),
@@ -33,6 +34,27 @@ export default function Reglages() {
     setActivating(false);
     flashToast(result.message);
     if (result.ok) setLicenceCode('');
+  };
+
+  const confirmDeleteAccount = () => {
+    Alert.alert(
+      'Supprimer mon compte',
+      "Action irréversible : ton compte, tes classes, tes personnages créés et toutes les données associées seront définitivement supprimés.",
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Supprimer',
+          style: 'destructive',
+          onPress: async () => {
+            setDeleting(true);
+            const result = await deleteAccount();
+            setDeleting(false);
+            if (result.ok) router.replace('/');
+            else flashToast(result.message);
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -95,6 +117,13 @@ export default function Reglages() {
       <View style={{ marginTop: 24, gap: 10 }}>
         <PrimaryButton label="À propos de Figures" dark={false} onPress={() => router.push('/about')} />
         <PrimaryButton label="Se déconnecter" dark={false} onPress={() => { logout(); router.replace('/'); }} />
+        <PrimaryButton
+          label="Supprimer mon compte"
+          dark={false}
+          loading={deleting}
+          onPress={confirmDeleteAccount}
+          style={{ borderColor: colors.red }}
+        />
       </View>
     </ScrollView>
   );

@@ -91,6 +91,7 @@ type Ctx = {
     eleveId: string; classId: string; className: string; classCode: string; prenom: string; nom: string;
   }) => void;
   logout: () => void;
+  deleteAccount: (password?: string) => Promise<{ ok: boolean; message: string }>;
 };
 
 export type StudentJoinResult = {
@@ -354,12 +355,37 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     setSession(null);
   }, []);
 
+  const deleteAccount = useCallback(async (password?: string) => {
+    const cur = sessionRef.current;
+    if (!cur) return { ok: false, message: 'Aucun compte à supprimer.' };
+    if (cur.role === 'prof') {
+      const { error } = await supabase.rpc('prof_delete_account');
+      if (error) return { ok: false, message: 'Impossible de supprimer le compte. Réessaie.' };
+    } else {
+      if (!password) return { ok: false, message: 'Entre ton mot de passe pour confirmer.' };
+      const { error } = await supabase.rpc('eleve_delete_account', {
+        p_eleve_id: cur.eleveId, p_password: password,
+      });
+      if (error) {
+        const msg = error.message?.includes('INVALID_PASSWORD')
+          ? 'Mot de passe incorrect.'
+          : 'Impossible de supprimer le compte. Réessaie.';
+        return { ok: false, message: msg };
+      }
+    }
+    setCollection([]);
+    setProgress({});
+    logout();
+    return { ok: true, message: 'Compte supprimé.' };
+  }, [logout]);
+
   const value: Ctx = {
     ready, session, consentAccepted, acceptConsent, a11y, toggleA11y,
     onboardSeen, markOnboardSeen, collection, progress, addOrUpdateFiche,
     recordProgress, masteredCount, toReviewCount, authLoading, authError,
     setAuthError, teacherSignup, teacherLogin, activateLicence, studentJoin,
     studentSetPassword, studentVerifyPassword, finalizeStudentSession, logout,
+    deleteAccount,
   };
 
   return <AppCtx.Provider value={value}>{children}</AppCtx.Provider>;

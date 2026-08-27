@@ -1,17 +1,44 @@
-import React from 'react';
-import { ScrollView, StyleSheet, Switch, View } from 'react-native';
+import React, { useState } from 'react';
+import { Alert, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { Text } from '../../src/components/AppText';
 import { useRouter } from 'expo-router';
 import { colors, fonts, radii } from '../../src/theme/theme';
 import { useSession } from '../../src/lib/session';
-import { Card, PrimaryButton, SectionTitle } from '../../src/components/ui';
+import { useToast } from '../../src/lib/toast';
+import { Card, PrimaryButton, SectionTitle, TextField } from '../../src/components/ui';
 
 export default function Espace() {
-  const { session, collection, a11y, toggleA11y, logout } = useSession();
+  const { session, collection, a11y, toggleA11y, logout, deleteAccount } = useSession();
+  const { flashToast } = useToast();
   const router = useRouter();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleting, setDeleting] = useState(false);
   if (session?.role !== 'eleve') return null;
 
   const initials = `${session.prenom[0] ?? ''}${session.nom[0] ?? ''}`.toUpperCase();
+
+  const confirmDeleteAccount = () => {
+    if (!deletePassword) { flashToast('Entre ton mot de passe pour confirmer.'); return; }
+    Alert.alert(
+      'Supprimer mon compte',
+      'Action irréversible : ton compte, tes fiches collectées et ta progression seront définitivement supprimés.',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Supprimer',
+          style: 'destructive',
+          onPress: async () => {
+            setDeleting(true);
+            const result = await deleteAccount(deletePassword);
+            setDeleting(false);
+            if (result.ok) router.replace('/');
+            else flashToast(result.message);
+          },
+        },
+      ]
+    );
+  };
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={{ padding: 20, paddingTop: 56, paddingBottom: 40 }}>
@@ -39,6 +66,37 @@ export default function Espace() {
       <View style={{ marginTop: 24, gap: 10 }}>
         <PrimaryButton label="À propos de Figures" dark={false} onPress={() => router.push('/about')} />
         <PrimaryButton label="Se déconnecter" dark={false} onPress={() => { logout(); router.replace('/'); }} />
+        {showDeleteConfirm ? (
+          <View style={styles.deleteBox}>
+            <Text style={styles.fieldLabel}>Mot de passe</Text>
+            <TextField
+              value={deletePassword}
+              onChangeText={setDeletePassword}
+              placeholder="Ton mot de passe"
+              secureTextEntry
+              style={{ marginTop: 4 }}
+            />
+            <PrimaryButton
+              label="Confirmer la suppression"
+              loading={deleting}
+              onPress={confirmDeleteAccount}
+              style={{ marginTop: 10, backgroundColor: colors.red }}
+            />
+            <PrimaryButton
+              label="Annuler"
+              dark={false}
+              onPress={() => { setShowDeleteConfirm(false); setDeletePassword(''); }}
+              style={{ marginTop: 8 }}
+            />
+          </View>
+        ) : (
+          <PrimaryButton
+            label="Supprimer mon compte"
+            dark={false}
+            onPress={() => setShowDeleteConfirm(true)}
+            style={{ borderColor: colors.red }}
+          />
+        )}
       </View>
     </ScrollView>
   );
@@ -74,4 +132,9 @@ const styles = StyleSheet.create({
   infoLabel: { fontFamily: fonts.sansBold, fontSize: 13, color: colors.muted },
   infoValue: { fontFamily: fonts.sans, fontSize: 13, color: colors.navy },
   lockNote: { fontFamily: fonts.sans, fontSize: 11, color: colors.placeholder, marginTop: 10, lineHeight: 15 },
+  deleteBox: {
+    backgroundColor: colors.cardWhite, borderWidth: 1, borderColor: colors.red,
+    borderRadius: radii.lg, padding: 14,
+  },
+  fieldLabel: { fontFamily: fonts.sansBold, fontSize: 11, color: colors.muted },
 });
