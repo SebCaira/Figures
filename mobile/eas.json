@@ -25,7 +25,8 @@
     "production": {
       "ios": {
         "appleId": "caira.sebastien@gmail.com",
-        "appleTeamId": "JV465JP3X4"
+        "appleTeamId": "JV465JP3X4",
+        "ascAppId": "6803163606"
       }
     }
   }
