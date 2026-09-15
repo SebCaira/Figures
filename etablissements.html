@@ -60,7 +60,22 @@
   .cta-btn:hover { background: #16202B; }
   .cta-note { font-size: 13px; color: #706C5E; }
 
-  .hero-visual { flex: 1; min-width: 280px; display: flex; justify-content: center; gap: 24px; }
+  .hero-visual { flex: 1; min-width: 280px; display: flex; justify-content: center; }
+  .hero-visual-inner { display: flex; gap: 24px; will-change: transform; }
+
+  #scroll-progress {
+    position: fixed; top: 0; left: 0; height: 3px; width: 100%;
+    background: linear-gradient(90deg, #B0863C, #21303F);
+    transform: scaleX(0); transform-origin: 0 50%; z-index: 50;
+  }
+
+  .nav-links a[data-section] { position: relative; padding-bottom: 4px; transition: color .2s ease; }
+  .nav-links a[data-section]::after {
+    content: ""; position: absolute; left: 0; right: 100%; bottom: 0; height: 2px;
+    background: #B0863C; transition: right .3s ease;
+  }
+  .nav-links a[data-section].active { color: #B0863C; }
+  .nav-links a[data-section].active::after { right: 0; }
 
   /* ---------- phone mockups (reused from marketing.html) ---------- */
   .phone {
@@ -214,6 +229,93 @@
   footer a { color: #706C5E; }
   footer a:hover { color: #B0863C; }
 
+  /* ---------- motion ---------- */
+  nav { transition: box-shadow .3s ease, background .3s ease; position: sticky; top: 0; z-index: 10; background: #ECE7DA; }
+  nav.nav-scrolled { box-shadow: 0 1px 0 rgba(33,48,63,0.08), 0 8px 24px -16px rgba(33,48,63,0.25); }
+
+  @keyframes floatA { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  @keyframes floatB { 0%, 100% { transform: translateY(38px) rotate(3deg); } 50% { transform: translateY(26px) rotate(1.5deg); } }
+  .phone { animation: floatA 6s ease-in-out infinite; }
+  .phone.tilt-down { animation: floatB 6.5s ease-in-out infinite; }
+
+  @keyframes riseIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .hero-copy > * { opacity: 0; animation: riseIn .7s ease forwards; }
+  .hero-copy .kicker { animation-delay: .05s; }
+  .hero-copy h1 { animation-delay: .12s; }
+  .hero-copy .lede { animation-delay: .2s; }
+  .hero-copy .cta-row { animation-delay: .28s; }
+  .hero-copy .cta-note { animation-delay: .34s; }
+  .hero-visual { opacity: 0; animation: riseIn .8s ease forwards; animation-delay: .2s; }
+
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity .6s ease, transform .6s ease; }
+  .reveal.in-view { opacity: 1; transform: none; }
+
+  .col-card, .feature, .pricing-card, .devis-card, .trust {
+    transition: transform .25s ease, box-shadow .25s ease;
+  }
+  .feature:hover, .col-card:hover, .pricing-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 18px 32px -16px rgba(33,48,63,0.22);
+  }
+
+  .cta-btn { transition: background .2s ease, transform .2s ease; }
+  .cta-btn:active { transform: scale(0.97); }
+  .cta-row a[href="#devis"] ~ a { transition: transform .2s ease; display: inline-block; }
+  .cta-row a[href="#devis"] ~ a:hover { transform: translateX(4px); }
+
+  .devis-submit { transition: background .2s ease, transform .15s ease; }
+  .devis-submit:active { transform: scale(0.98); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+    .reveal { opacity: 1 !important; transform: none !important; }
+    .hero-copy > *, .hero-visual { opacity: 1 !important; }
+  }
+
+  .hero { position: relative; overflow: visible; }
+  .ambient-blob {
+    position: absolute; border-radius: 50%; filter: blur(70px); z-index: 0; pointer-events: none;
+  }
+  .blob-a { width: 360px; height: 360px; background: rgba(176,134,60,0.32); top: -80px; left: -60px; animation: blobDrift1 14s ease-in-out infinite; }
+  .blob-b { width: 320px; height: 320px; background: rgba(46,125,107,0.22); bottom: -90px; right: 20px; animation: blobDrift2 17s ease-in-out infinite; }
+  @keyframes blobDrift1 { 0%, 100% { transform: translate(0,0) scale(1); } 50% { transform: translate(34px,-24px) scale(1.1); } }
+  @keyframes blobDrift2 { 0%, 100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-28px,26px) scale(0.92); } }
+  .hero-copy, .hero-visual { position: relative; z-index: 1; }
+
+  .hero-visual { perspective: 1200px; }
+  .phone-tilt { transition: transform .15s ease-out; transform-style: preserve-3d; }
+
+  .video-teaser {
+    display: inline-flex; align-items: center; gap: 12px; margin-top: 18px;
+    background: #FFFCF5; border: 1px solid #E7E1D3; border-radius: 14px; padding: 9px 18px 9px 9px;
+    text-decoration: none; color: #21303F; transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .video-teaser:hover { transform: translateY(-3px); box-shadow: 0 16px 30px -16px rgba(33,48,63,0.3); }
+  .video-play {
+    width: 36px; height: 36px; border-radius: 50%; background: #21303F; color: #F6F2E9;
+    display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;
+    animation: pulseRing 2.6s ease-out infinite;
+  }
+  @keyframes pulseRing {
+    0% { box-shadow: 0 0 0 0 rgba(176,134,60,0.55); }
+    70% { box-shadow: 0 0 0 13px rgba(176,134,60,0); }
+    100% { box-shadow: 0 0 0 0 rgba(176,134,60,0); }
+  }
+  .video-teaser-title { display: block; font-weight: 600; font-size: 13.5px; }
+  .video-teaser-sub { display: block; font-size: 11.5px; color: #706C5E; margin-top: 1px; }
+
+  .cta-btn { position: relative; overflow: hidden; }
+  .cta-btn::after {
+    content: ""; position: absolute; top: 0; left: -60%; width: 40%; height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.35), transparent);
+    transform: skewX(-20deg); transition: left .6s ease;
+  }
+  .cta-btn:hover::after { left: 130%; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ambient-blob, .video-play { animation: none !important; }
+  }
+
   @media (max-width: 860px) {
     .hero { flex-direction: column; text-align: center; }
     .lede { margin-left: auto; margin-right: auto; }
@@ -232,20 +334,24 @@
 </head>
 <body>
 
+<div id="scroll-progress"></div>
+
 <nav>
   <div class="brand">
     <div class="brand-mark">F<span>.</span></div>
     <div class="brand-name">Figures</div>
   </div>
   <div class="nav-links">
-    <a href="#comment-ca-marche">Comment ça marche</a>
-    <a href="#tarifs">Tarifs</a>
-    <a href="#devis">Contact</a>
+    <a href="#comment-ca-marche" data-section="comment-ca-marche">Comment ça marche</a>
+    <a href="#tarifs" data-section="tarifs">Tarifs</a>
+    <a href="#devis" data-section="devis">Contact</a>
     <a class="nav-switch" href="./marketing.html">Vous êtes professeur ? → Découvrir Figures</a>
   </div>
 </nav>
 
 <header class="hero">
+  <div class="ambient-blob blob-a"></div>
+  <div class="ambient-blob blob-b"></div>
   <div class="hero-copy">
     <div class="kicker">Application de révision · Offre établissement</div>
     <h1>Une licence, tout votre établissement.</h1>
@@ -254,10 +360,19 @@
       <a class="cta-btn" href="#devis">Demander un devis</a>
       <a href="https://figurescollege.netlify.app/" style="font-size:14px;font-weight:600;">Voir l'application →</a>
     </div>
+    <a class="video-teaser" href="./video-beta.html">
+      <span class="video-play">▶</span>
+      <span>
+        <span class="video-teaser-title">Voir la démo en vidéo</span>
+        <span class="video-teaser-sub">3 min — création, quiz, suivi</span>
+      </span>
+    </a>
     <p class="cta-note" style="margin-top:10px;">Offre de lancement 2026-2027</p>
   </div>
 
   <div class="hero-visual">
+   <div class="hero-visual-inner" id="heroParallax">
+    <div class="phone-tilt">
     <div class="phone">
       <div class="phone-screen">
         <div class="screen-logo">F<span>.</span></div>
@@ -280,6 +395,8 @@
         </div>
       </div>
     </div>
+    </div>
+    <div class="phone-tilt">
     <div class="phone tilt-down">
       <div class="phone-screen">
         <div class="fiche-title">Mes fiches</div>
@@ -301,6 +418,8 @@
         </div>
       </div>
     </div>
+    </div>
+   </div>
   </div>
 </header>
 
@@ -308,7 +427,7 @@
   <div class="section-kicker">Comment ça marche</div>
   <h2>Deux espaces, une classe</h2>
   <div class="cols">
-    <div class="col-card">
+    <div class="col-card reveal">
       <span class="tag prof">Professeur</span>
       <h3>Créer et partager</h3>
       <ol>
@@ -318,7 +437,7 @@
         <li>Suivre la progression de chaque élève en un coup d'œil.</li>
       </ol>
     </div>
-    <div class="col-card">
+    <div class="col-card reveal" style="transition-delay:.12s">
       <span class="tag eleve">Élève</span>
       <h3>Réviser en collectionnant</h3>
       <ol>
@@ -335,17 +454,17 @@
   <div class="section-kicker">Pourquoi un établissement plutôt qu'un prof isolé</div>
   <h2>Une licence pour tout l'établissement</h2>
   <div class="feature-grid">
-    <div class="feature">
+    <div class="feature reveal">
       <div class="feature-mark" style="background:#F3E9D6;">✉️</div>
       <h4>Un seul interlocuteur, une seule facture</h4>
       <p>Le gestionnaire ou le chef d'établissement souscrit une fois. Tous les professeurs peuvent ensuite activer leur compte avec le même code, sans démarche individuelle.</p>
     </div>
-    <div class="feature">
+    <div class="feature reveal" style="transition-delay:.1s">
       <div class="feature-mark" style="background:#E6F2EC;">♾️</div>
       <h4>Pas de limite de professeurs</h4>
       <p>Autant de classes et d'enseignants que nécessaire, sans surcoût par utilisateur.</p>
     </div>
-    <div class="feature">
+    <div class="feature reveal" style="transition-delay:.2s">
       <div class="feature-mark" style="background:#E4EDF5;">📊</div>
       <h4>Suivi centralisé</h4>
       <p>Chaque professeur garde ses classes et son suivi, l'établissement garde le contrôle de la licence (durée, renouvellement).</p>
@@ -357,7 +476,7 @@
   <div class="section-kicker">Tarifs</div>
   <h2>Offre de lancement 2026-2027</h2>
 
-  <div class="pricing-founder">
+  <div class="pricing-founder reveal">
     <span class="badge">Tarif fondateur</span>
     <p><strong>Garanti à vie</strong> pour tout établissement qui signe durant l'année scolaire 2026-2027, tant que la licence est renouvelée sans interruption.</p>
     <p>Licence valable du 1er septembre au 31 août, quelle que soit la date de signature.</p>
@@ -365,20 +484,20 @@
   </div>
 
   <div class="pricing-cols">
-    <div class="pricing-card">
+    <div class="pricing-card reveal">
       <div class="pricing-card-head"><h3>Collège</h3></div>
       <table class="pricing-table">
-        <tr><td>Moins de 400 élèves</td><td>199 € / an</td></tr>
-        <tr><td>400 à 700 élèves</td><td>349 € / an</td></tr>
-        <tr><td>Plus de 700 élèves</td><td>549 € / an</td></tr>
+        <tr><td>Moins de 400 élèves</td><td class="price-count" data-value="199">0 € / an</td></tr>
+        <tr><td>400 à 700 élèves</td><td class="price-count" data-value="349">0 € / an</td></tr>
+        <tr><td>Plus de 700 élèves</td><td class="price-count" data-value="549">0 € / an</td></tr>
       </table>
     </div>
-    <div class="pricing-card">
+    <div class="pricing-card reveal" style="transition-delay:.12s">
       <div class="pricing-card-head"><h3>Lycée</h3></div>
       <table class="pricing-table">
-        <tr><td>Moins de 500 élèves</td><td>349 € / an</td></tr>
-        <tr><td>500 à 900 élèves</td><td>549 € / an</td></tr>
-        <tr><td>Plus de 900 élèves</td><td>799 € / an</td></tr>
+        <tr><td>Moins de 500 élèves</td><td class="price-count" data-value="349">0 € / an</td></tr>
+        <tr><td>500 à 900 élèves</td><td class="price-count" data-value="549">0 € / an</td></tr>
+        <tr><td>Plus de 900 élèves</td><td class="price-count" data-value="799">0 € / an</td></tr>
       </table>
     </div>
   </div>
@@ -390,7 +509,7 @@
   <div class="section-kicker">Contact</div>
   <h2>Demander un devis</h2>
 
-  <form class="devis-card" action="https://formspree.io/f/mjybzpan" method="POST">
+  <form class="devis-card reveal" action="https://formspree.io/f/mjybzpan" method="POST">
     <div class="devis-grid">
       <div class="field full">
         <label for="etablissement">Nom de l'établissement</label>
@@ -430,7 +549,7 @@
 </section>
 
 <section>
-  <div class="trust">
+  <div class="trust reveal">
     <div class="trust-copy">
       <h3>Une question avant de commencer ?</h3>
       <p>Consultez notre politique de confidentialité ou écrivez-nous directement — on répond vite.</p>
@@ -448,5 +567,90 @@
   <div><a href="./confidentialite.html">Confidentialité</a> &nbsp;·&nbsp; <a href="./support.html">Support</a></div>
 </footer>
 
+<script>
+(function () {
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function animateCount(el) {
+    var target = parseInt(el.dataset.value, 10);
+    if (reduceMotion || !target) { el.textContent = target + ' € / an'; return; }
+    var start = performance.now(), duration = 900;
+    function step(now) {
+      var p = Math.min((now - start) / duration, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * eased) + ' € / an';
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  var reveals = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          entry.target.querySelectorAll('.price-count').forEach(animateCount);
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    reveals.forEach(function (el) { io.observe(el); });
+  } else {
+    reveals.forEach(function (el) { el.classList.add('in-view'); });
+    document.querySelectorAll('.price-count').forEach(animateCount);
+  }
+
+  var nav = document.querySelector('nav');
+  var progress = document.getElementById('scroll-progress');
+  var parallax = document.getElementById('heroParallax');
+  var navLinks = document.querySelectorAll('.nav-links a[data-section]');
+  var sections = Array.prototype.map.call(navLinks, function (a) {
+    return document.getElementById(a.dataset.section);
+  }).filter(Boolean);
+
+  var onScroll = function () {
+    var y = window.scrollY;
+    if (y > 12) nav.classList.add('nav-scrolled');
+    else nav.classList.remove('nav-scrolled');
+
+    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    if (progress) progress.style.transform = 'scaleX(' + (docHeight > 0 ? Math.min(y / docHeight, 1) : 0) + ')';
+
+    if (parallax && !reduceMotion) {
+      parallax.style.transform = 'translateY(' + Math.min(y * 0.12, 40) + 'px)';
+    }
+
+    var current = null;
+    sections.forEach(function (sec) {
+      if (sec.getBoundingClientRect().top <= 120) current = sec.id;
+    });
+    navLinks.forEach(function (a) {
+      a.classList.toggle('active', a.dataset.section === current);
+    });
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  var canHover = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (canHover && !reduceMotion) {
+    var tiltEls = document.querySelectorAll('.phone-tilt');
+    var hero = document.querySelector('.hero');
+    hero.addEventListener('mousemove', function (e) {
+      tiltEls.forEach(function (el) {
+        var r = el.getBoundingClientRect();
+        var dx = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
+        var dy = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
+        var rx = Math.max(Math.min(-dy * 8, 8), -8);
+        var ry = Math.max(Math.min(dx * 8, 8), -8);
+        el.style.transform = 'perspective(1200px) rotateX(' + rx + 'deg) rotateY(' + ry + 'deg)';
+      });
+    });
+    hero.addEventListener('mouseleave', function () {
+      tiltEls.forEach(function (el) { el.style.transform = ''; });
+    });
+  }
+})();
+</script>
 </body>
 </html>
